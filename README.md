@@ -1,8 +1,10 @@
 # Haxe Loader for Webpack
 
+This loader allows you to load hxml files directly into webpack, and included the Haxe-compiled Javascript result directly in your bundle.
+
 There are several reasons for doing this:
 
-- If you are going to use NPM libraries as externs, you need to compile with Webpack or Browserify etc.
+- If you are going to use NPM libraries as externs, you need to compile with Webpack or Browserify etc. Having the two compile steps (Haxe and Webpack) makes it easier.
 - There's a good chance you'll want webpack anyway for compiling CSS (or SASS or LESS), managing static assets, or minifying the resulting JS bundle.
 - When Webpack is set up right, it has a nice development experience, with things like:
     - `webpack --watch` to watch any changes you make to a file and recompile.
@@ -10,10 +12,10 @@ There are several reasons for doing this:
 
 With this loader, you are able to:
 
-- Use a `hxml` fil as the entry point for your build.
-- Change any `*.hx` source file, and have haxe recompile and the browser refresh automatically as soon as you save.
+- Use a `hxml` file as the entry point for your build.
+- Change any `*.hx` source file, and have haxe re-compile, webpack re-bundle, and the browser refresh automatically as soon as you save.
 
-Currently
+Currently the loader only supports HXML files which export exactly one Javascript file.  Other targets may be supported in future.
 
 ### Example webpack configuration
 
