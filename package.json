@@ -1,0 +1,11 @@
+{
+  "name": "haxe-loader",
+  "description": "Load Haxe hxml builds directly into Webpack JS bundles",
+  "version": "0.1.0",
+  "author": "Jason O'Neil <jason.oneil@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasononeil/webpack-haxe-loader.git"
+  }
+}
