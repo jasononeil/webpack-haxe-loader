@@ -15,16 +15,21 @@ With this loader, you are able to:
 - Use a `hxml` file as the entry point for your build.
 - Change any `*.hx` source file, and have haxe re-compile, webpack re-bundle, and the browser refresh automatically as soon as you save.
 
-Currently the loader only supports HXML files which export exactly one Javascript file.  Other targets may be supported in future.
+Currently the loader only supports HXML files which export exactly one output, so you cannot use `--next` to build multiple things.  Instead you can use multiple hxml files and list each of them in Webpack.
+
+If you try to build a hxml file that is for another target, like Neko, PHP or CPP - the hxml file will be executed and an empty JS file will be passed on to webpack, which you can safely ignore.  (If anyone knows how to have a loader inform webpack that no output is required let me know!)
 
 ### Example webpack configuration
 
 ```js
 module.exports = {
-    entry: './client.hxml',
+    entry: {
+        client: './client.hxml',
+        server: './server.hxml', // Could compile PHP or Neko etc, does not have to be JS.
+    },
     output: {
         path: __dirname + "/www/assets",
-        filename: 'react-test.bundle.js'
+        filename: '[name].bundle.js'
     },
     module: {
         rules: [

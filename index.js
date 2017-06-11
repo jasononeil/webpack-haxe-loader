@@ -37,7 +37,7 @@ module.exports = function(hxmlContent) {
 
         if (name === '--next') {
             var err = `${this
-                .resourcePath} included a "--next" line, hxml-loader only supports a single JS build per hxml file.`;
+                .resourcePath} included a "--next" line, hxml-loader only supports a single build per hxml file.`;
             return cb(err);
         }
 
@@ -49,12 +49,6 @@ module.exports = function(hxmlContent) {
                 jsOutputFile = value;
             }
         }
-    }
-
-    if (!jsOutputFile) {
-        var err = `${this
-            .resourcePath} did not include a "-js" line, hxml-loader only supports a single JS build per hxml file.`;
-        return cb(err);
     }
 
     // Execute the Haxe build.
@@ -84,6 +78,12 @@ module.exports = function(hxmlContent) {
             // Delete the temporary build info file.
             fs.unlink(haxeBuildInfoFile, err => {
                 if (err) return cb(err);
+
+                if (!jsOutputFile) {
+                    // If the hxml file outputs something other than JS, we should not include it in the bundle.
+                    // We're only passing it through webpack so that we get `watch` and the like to work.
+                    return cb(null, "");
+                }
 
                 // Read the resulting JS file.
                 fs.readFile(jsOutputFile, (err, data) => {
