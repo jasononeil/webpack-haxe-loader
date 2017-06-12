@@ -57,6 +57,26 @@ Now you can run:
 
 Please note `npm run ...` also works just fine.
 
+### Requiring files
+
+To require files, you can use [`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require) or, on externs you can add `@:jsRequire` metadata.
+
+These both generate `require()` statements that webpack will process when it compiles.
+
+One problem with `js.Lib.require()` is that it imports relative to the HXML file, rather than relative to the current HX file.  It also cannot be compiled on platforms other than JS.
+
+We have a convenience method you can call instead:
+
+    Webpack.require('./MyFile.css');
+
+This will generate a `js.Lib.require()` call, and the `./` makes it relative to the current `*.hx` file. It will call `js.Lib.require()` on Javascript targets, and be silently ignored on all other targets.  In future we may try to handle require statements for other targets.
+
+Please note when you compile through webpack, the `Webpack` class is made available.
+If you try to compile the hxml file directly though, or use the hxml file for completion, it may not know where to find the `Webpack.hx` file.
+You can add the class path to your hxml file:
+
+    -cp node_modules/haxe-loader/macro
+
 ### Dev server setup
 
 You can use [webpack-dev-server](https://webpack.js.org/configuration/dev-server/) to watch changes and auto-refresh a page after Haxe has compiled any changes.
