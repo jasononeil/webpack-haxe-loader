@@ -9,7 +9,6 @@ module.exports = function(hxmlContent) {
     const cb = this.async();
 
     let jsOutputFile = null;
-    let haxeBuildInfoFile = '_tmp_haxe_build_info.json';
     let args = [];
 
     // Add args that are specific to hxml-loader
@@ -19,9 +18,7 @@ module.exports = function(hxmlContent) {
     // We use a special macro to output a file containing all `*.hx` source files used in the haxe build.
     // We can then use this to register them as webpack dependencies so they will be watched for changes.
     args.push('-cp');
-    args.push(`"${__dirname}/macro/"`);
-    args.push('--macro');
-    args.push(`"WebpackLoaderUtil.outputJson('${haxeBuildInfoFile}')"`);
+    args.push(`"${__dirname}/haxelib/"`);
 
     // Process all of the args in the hxml file.
     for (let line of hxmlContent.split('\n')) {
@@ -47,6 +44,9 @@ module.exports = function(hxmlContent) {
 
             if (name === '-js') {
                 jsOutputFile = value;
+            } else if (name === '-cp') {
+                var classPath = path.resolve(value);
+                this.addContextDependency(classPath);
             }
         }
     }
@@ -63,35 +63,17 @@ module.exports = function(hxmlContent) {
             return cb(err);
         }
 
-        // TODO: use promises here to avoid callback crazyness.
+        if (!jsOutputFile) {
+            // If the hxml file outputs something other than JS, we should not include it in the bundle.
+            // We're only passing it through webpack so that we get `watch` and the like to work.
+            return cb(null, "");
+        }
 
-        // Read the Haxe build info so we can register dependencies.
-        fs.readFile(haxeBuildInfoFile, (err, json) => {
+        // Read the resulting JS file.
+        fs.readFile(jsOutputFile, (err, data) => {
             if (err) return cb(err);
 
-            var data = JSON.parse(json);
-            for (let file of data.modules) {
-                var filePath = path.resolve(file);
-                this.addDependency(filePath);
-            }
-
-            // Delete the temporary build info file.
-            fs.unlink(haxeBuildInfoFile, err => {
-                if (err) return cb(err);
-
-                if (!jsOutputFile) {
-                    // If the hxml file outputs something other than JS, we should not include it in the bundle.
-                    // We're only passing it through webpack so that we get `watch` and the like to work.
-                    return cb(null, "");
-                }
-
-                // Read the resulting JS file.
-                fs.readFile(jsOutputFile, (err, data) => {
-                    if (err) return cb(err);
-
-                    return cb(null, data);
-                });
-            });
+            return cb(null, data);
         });
     });
 };

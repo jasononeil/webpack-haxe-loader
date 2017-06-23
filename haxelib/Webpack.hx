@@ -6,7 +6,7 @@ using haxe.io.Path;
 #end
 
 class Webpack {
-	public static macro function require(fileExpr:ExprOf<String>):Expr {
+	public static macro function require(fileExpr:ExprOf<String>):ExprOf<Any> {
 		#if macro
 		if (Context.defined('js')) {
 			// If the file path begins with "./"
@@ -16,11 +16,11 @@ class Webpack {
 				var directory = posInfos.file.directory();
 				file = './${directory}/${file.substr(2)}';
 			}
-			return macro js.Lib.require($v{file});
+			return macro (js.Lib.require($v{file}):Any);
 		} else {
 			// TODO: find a way to track "required" files on non-JS builds.
 			// Perhaps by tracking in metadata and saving to the JSON outputFile, and processng inside the loader.
-			return macro null;
+			return macro (null:Any);
 		}
 		#end
 	}

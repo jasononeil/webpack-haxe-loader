@@ -75,7 +75,7 @@ Please note when you compile through webpack, the `Webpack` class is made availa
 If you try to compile the hxml file directly though, or use the hxml file for completion, it may not know where to find the `Webpack.hx` file.
 You can add the class path to your hxml file:
 
-    -cp node_modules/haxe-loader/macro
+    -cp node_modules/haxe-loader/haxelib
 
 ### Dev server setup
 
