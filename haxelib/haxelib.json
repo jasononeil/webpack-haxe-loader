@@ -1,0 +1,13 @@
+{
+  "name": "haxe-loader",
+  "url": "https://github.com/jasononeil/webpack-haxe-loader",
+  "license": "MIT",
+  "tags": ["webpack", "js"],
+  "description": "Haxe loader for webpack",
+  "version": "0.0.1",
+  "releasenote": "",
+  "contributors": ["jason", "elsassph"],
+  "dependencies": {
+    "tink_macro": "0.14.0"
+  }
+}

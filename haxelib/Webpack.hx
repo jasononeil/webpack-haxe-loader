@@ -5,7 +5,10 @@ using tink.MacroApi;
 using haxe.io.Path;
 #end
 
-class Webpack {
+extern class Webpack {
+	/**
+	 * JavaScript 'require' function, for synchronous module loading
+	 */
 	public static macro function require(fileExpr:ExprOf<String>):ExprOf<Any> {
 		#if macro
 		if (Context.defined('js')) {
@@ -23,5 +26,34 @@ class Webpack {
 			return macro (null:Any);
 		}
 		#end
+	}
+
+	/**
+	 * JavaScript 'import' function, for asynchronous module loading
+	 */
+	public static macro function load(classRef:Expr) {
+		switch (Context.typeof(classRef)) {
+			case haxe.macro.Type.TType(_.get() => t, _):
+				var module = t.module.split('.').join('_');
+				var ns = Context.definedValue('webpack_namespace');
+				var query = '!haxe-loader?$ns/$module!';
+				return macro {
+					untyped __js__('System.import')($v{query})
+						.then(function(exports) {
+							untyped $i{module} = $p{["$s", module]};
+							return exports;
+						});
+				}
+			default:
+		}
+		Context.fatalError('A module class reference is required', Context.currentPos());
+		return macro {};
+	}
+
+	/**
+	 * JavaScript 'module.exports' helper
+	 */
+	public static macro function export(expr:Expr) {
+		return macro untyped module.exports = $expr;
 	}
 }
