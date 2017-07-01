@@ -3,17 +3,13 @@
 const fs = require('fs');
 const path = require('path');
 const exec = require('child_process').exec;
-const loaderUtils = require('loader-utils');
 const tmp = require('tmp');
 const hash = require('hash-sum');
-const split = require('./node_modules/haxe-modular/tool/bin/split');
+const split = require('haxe-modular/tool/bin/split');
 
 const cache = Object.create(null);
 
 module.exports = function(hxmlContent) {
-
-    console.log('LOCAL VERSION');
-
     this.cacheable && this.cacheable();
     const cb = this.async();
 
@@ -26,7 +22,6 @@ module.exports = function(hxmlContent) {
     }
 
     const ns = path.basename(request).replace('.hxml', '');
-    const options = loaderUtils.getOptions(this) || {};
     const jsTempFile = makeJSTempFile(ns);
     const { jsOutputFile, classpath, args } = prepare(this, hxmlContent, jsTempFile);
     args.push('-D', `webpack_namespace=${ns}`);
@@ -65,7 +60,8 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
 
     // Split output
     const modules = findImports(content);
-    const results = split.run(jsTempFile.path, jsOutputFile, modules, this.debug, true)
+    const debug = fs.existsSync(`${jsTempFile.path}.map`);
+    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true)
         .filter(entry => entry && entry.source);
     
     // Inject .hx sources in map file
@@ -141,11 +137,10 @@ function findImports(content) {
 
 function makeJSTempFile() {
     const path = tmp.tmpNameSync({ postfix: '.js' });
+    const nop = () => {};
     const cleanup = () => {
-        try {
-            fs.unlink(path);
-            fs.unlink(`${path}.map`);
-        } catch (_) {}
+        fs.unlink(path, nop);
+        fs.unlink(`${path}.map`, nop);
     };
     return { path, cleanup };
 }
