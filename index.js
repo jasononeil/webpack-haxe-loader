@@ -10,21 +10,23 @@ const split = require('haxe-modular/tool/bin/split');
 const cache = Object.create(null);
 
 module.exports = function(hxmlContent) {
-    this.cacheable && this.cacheable();
-    const cb = this.async();
+    const context = this;
+    context.cacheable && context.cacheable();
+    const cb = context.async();
 
-    const request = this.resourcePath;
+    const request = context.resourcePath;
     if (!request) {
         // Loader was called without specifying a hxml file
         // Expecting a require of the form '!haxe-loader?hxmlName/moduleName!'
-        fromCache(this, this.query, cb);
+        fromCache(context, context.query, cb);
         return;
     }
 
     const ns = path.basename(request).replace('.hxml', '');
     const jsTempFile = makeJSTempFile(ns);
-    const { jsOutputFile, classpath, args } = prepare(this, hxmlContent, jsTempFile);
-    args.push('-D', `webpack_namespace=${ns}`);
+    const { jsOutputFile, classpath, args } = prepare(context, ns, hxmlContent, jsTempFile);
+
+    registerDepencencies(context, classpath);
 
     // Execute the Haxe build.
     exec(`haxe ${args.join(' ')}`, (err, stdout, stderr) => {
@@ -41,9 +43,9 @@ module.exports = function(hxmlContent) {
         // Read the resulting JS file and return the main module
         const processed = processOutput(ns, jsTempFile, jsOutputFile);
         if (processed) {
-            updateCache(this, ns, processed, classpath);
+            updateCache(context, ns, processed, classpath);
         }
-        returnModule(this, ns, 'Main', cb);
+        returnModule(context, ns, 'Main', cb);
     });
 };
 
@@ -96,8 +98,6 @@ function returnModule(context, ns, name, cb) {
         throw new Error(`${ns}.hxml did not emit a module called '${name}'`);
     }
 
-    // TODO we need smarter dependency flagging
-    classpath.forEach(path => context.addContextDependency(path));
     cb(null, entry.source.content, entry.map ? entry.map.content : null);
 }
 
@@ -114,6 +114,9 @@ function fromCache(context, query, cb) {
     if (!cached) {
         throw new Error(`${ns}.hxml is not a known entry point`);
     }
+
+    registerDepencencies(context, cached.classpath);
+
     if (!cached.results.length) {
         throw new Error(`${ns}.hxml did not emit any modules`);
     }
@@ -145,19 +148,21 @@ function makeJSTempFile() {
     return { path, cleanup };
 }
 
-function prepare(context, hxmlContent, jsTempFile) {
+function registerDepencencies(context, classpath) {
+    // Listen for any changes in the classpath
+    classpath.forEach(path => context.addContextDependency(path));
+}
+
+function prepare(context, ns, hxmlContent, jsTempFile) {
     const args = [];
     const classpath = [];
     let jsOutputFile = null;
 
     // Add args that are specific to hxml-loader
-    if (context.debug) {
+    if (context.sourceMap) {
         args.push('-debug');
     }
-    // We use a special macro to output a file containing all `*.hx` source files used in the haxe build.
-    // We can then use this to register them as webpack dependencies so they will be watched for changes.
-    args.push('-cp');
-    args.push(`"${__dirname}/haxelib/"`);
+    args.push('-D', `webpack_namespace=${ns}`);
 
     // Process all of the args in the hxml file.
     for (let line of hxmlContent.split('\n')) {

@@ -5,12 +5,11 @@ using tink.MacroApi;
 using haxe.io.Path;
 #end
 
-extern class Webpack {
+class Webpack {
 	/**
 	 * JavaScript 'require' function, for synchronous module loading
 	 */
-	public static macro function require(fileExpr:ExprOf<String>):ExprOf<Any> {
-		#if macro
+	public static macro function require(fileExpr:ExprOf<String>) {
 		if (Context.defined('js')) {
 			// If the file path begins with "./"
 			var file = fileExpr.getString().sure();
@@ -25,7 +24,6 @@ extern class Webpack {
 			// Perhaps by tracking in metadata and saving to the JSON outputFile, and processng inside the loader.
 			return macro (null:Any);
 		}
-		#end
 	}
 
 	/**
