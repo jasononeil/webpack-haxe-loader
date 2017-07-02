@@ -1,5 +1,6 @@
 "use_strict";
 
+const loaderUtils = require('loader-utils');
 const fs = require('fs');
 const path = require('path');
 const exec = require('child_process').exec;
@@ -29,6 +30,7 @@ module.exports = function(hxmlContent) {
     registerDepencencies(context, classpath);
 
     // Execute the Haxe build.
+    console.log('haxe', args.join(' '));
     exec(`haxe ${args.join(' ')}`, (err, stdout, stderr) => {
         if (err) {
             return cb(err);
@@ -154,6 +156,7 @@ function registerDepencencies(context, classpath) {
 }
 
 function prepare(context, ns, hxmlContent, jsTempFile) {
+    const options = loaderUtils.getOptions(context) || {};
     const args = [];
     const classpath = [];
     let jsOutputFile = null;
@@ -195,5 +198,8 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
             args.push(value);
         }
     }
+
+    if (options.extra) args.push(options.extra);
+
     return { jsOutputFile, classpath, args };
 }
