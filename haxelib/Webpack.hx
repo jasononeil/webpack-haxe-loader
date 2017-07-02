@@ -29,7 +29,7 @@ class Webpack {
 	/**
 	 * JavaScript 'import' function, for asynchronous module loading
 	 */
-	public static macro function load(classRef:Expr) {
+	public static macro function bundle(classRef:Expr) {
 		switch (Context.typeof(classRef)) {
 			case haxe.macro.Type.TType(_.get() => t, _):
 				var module = t.module.split('.').join('_');
