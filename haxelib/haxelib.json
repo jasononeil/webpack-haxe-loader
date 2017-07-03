@@ -6,8 +6,5 @@
   "description": "Haxe loader for webpack",
   "version": "0.0.1",
   "releasenote": "",
-  "contributors": ["jason", "elsassph"],
-  "dependencies": {
-    "tink_macro": "0.14.0"
-  }
+  "contributors": ["jason", "elsassph"]
 }

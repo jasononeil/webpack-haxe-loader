@@ -1,35 +1,36 @@
 #if macro
 import haxe.macro.Expr;
 import haxe.macro.Context;
-using tink.MacroApi;
 using haxe.io.Path;
+using StringTools;
 #end
 
 class Webpack {
 	/**
 	 * JavaScript 'require' function, for synchronous module loading
 	 */
-	public static macro function require(fileExpr:ExprOf<String>) {
+	public static macro function require(fileExpr:ExprOf<String>):ExprOf<Dynamic> {
 		if (Context.defined('js')) {
-			// If the file path begins with "./"
-			var file = fileExpr.getString().sure();
-			if (StringTools.startsWith(file, "./")) {
+			var file = getString(fileExpr);
+			// Adjust relative path
+			// TODO: handle inline loader syntax
+			if (file.startsWith('.')) {
 				var posInfos = Context.getPosInfos(fileExpr.pos);
 				var directory = posInfos.file.directory();
-				file = './${directory}/${file.substr(2)}';
+				file = rebaseRelativePath(directory, file);
 			}
-			return macro (js.Lib.require($v{file}):Any);
+			return macro js.Lib.require($v{file});
 		} else {
 			// TODO: find a way to track "required" files on non-JS builds.
 			// Perhaps by tracking in metadata and saving to the JSON outputFile, and processng inside the loader.
-			return macro (null:Any);
+			return macro null;
 		}
 	}
 
 	/**
 	 * JavaScript 'import' function, for asynchronous module loading
 	 */
-	public static macro function bundle(classRef:Expr) {
+	public static macro function async(classRef:Expr) {
 		switch (Context.typeof(classRef)) {
 			case haxe.macro.Type.TType(_.get() => t, _):
 				var module = t.module.split('.').join('_');
@@ -54,4 +55,42 @@ class Webpack {
 	public static macro function export(expr:Expr) {
 		return macro untyped module.exports = $expr;
 	}
+
+	#if macro
+	static function getString(expr:Expr) {
+		switch (expr.expr) {
+			case EConst(CString(v)): return v;
+			default: 
+				Context.fatalError('Webpack.require expects a String literal', expr.pos);
+				return '#ERROR#';
+		}
+	}
+
+	static function rebaseRelativePath(directory:String, file:String) {
+		if (file.startsWith('./')) {
+			file = file.substr(2);
+			return './${directory}/${file}';
+		}
+
+		while (file.startsWith('../')) {
+			if (directory.indexOf('/') > 0) {
+				file = file.substr(3);
+				directory = directory.directory();
+			} else if (directory != '') {
+				file = file.substr(3);
+				directory = '';
+				break;
+			}
+		}
+		
+		if (directory != '') {
+			return './${directory}/${file}';
+		}
+		if (file.startsWith('.')) {
+			// file goes further up the project root
+			return file;
+		}
+		return './${file}';
+	}
+	#end
 }
