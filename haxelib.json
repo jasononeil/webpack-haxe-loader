@@ -2,6 +2,7 @@
   "name": "haxe-loader",
   "url": "https://github.com/jasononeil/webpack-haxe-loader",
   "license": "MIT",
+  "classPath": "haxelib/",
   "tags": ["webpack", "js"],
   "description": "Haxe loader for webpack",
   "version": "0.0.1",
