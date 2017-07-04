@@ -12,5 +12,8 @@
     "hash-sum": "^1.0.2",
     "haxe-modular": "git://github.com/elsassph/haxe-modular.git#feature/webpack",
     "tmp": "0.0.31"
+  },
+  "devDependencies": {
+    "loader-utils": "^1.1.0"
   }
 }
