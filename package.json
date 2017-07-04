@@ -1,7 +1,7 @@
 {
   "name": "haxe-loader",
-  "description": "Load Haxe hxml builds directly into Webpack JS bundles",
-  "version": "0.3.0",
+  "description": "Make loader-utils a real dependency",
+  "version": "0.3.1",
   "author": "Jason O'Neil <jason.oneil@gmail.com>",
   "license": "MIT",
   "repository": {
