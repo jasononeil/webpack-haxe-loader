@@ -9,13 +9,12 @@ class Webpack {
 	/**
 	 * JavaScript 'require' function, for synchronous module loading
 	 */
-	public static macro function require(fileExpr:ExprOf<String>):ExprOf<Dynamic> {
+	public static macro function require(file:String):ExprOf<Dynamic> {
 		if (Context.defined('js')) {
-			var file = getString(fileExpr);
 			// Adjust relative path
 			// TODO: handle inline loader syntax
 			if (file.startsWith('.')) {
-				var posInfos = Context.getPosInfos(fileExpr.pos);
+				var posInfos = Context.getPosInfos(Context.currentPos());
 				var directory = posInfos.file.directory();
 				file = rebaseRelativePath(directory, file);
 			}
@@ -57,15 +56,6 @@ class Webpack {
 	}
 
 	#if macro
-	static function getString(expr:Expr) {
-		switch (expr.expr) {
-			case EConst(CString(v)): return v;
-			default: 
-				Context.fatalError('Webpack.require expects a String literal', expr.pos);
-				return '#ERROR#';
-		}
-	}
-
 	static function rebaseRelativePath(directory:String, file:String) {
 		if (file.startsWith('./')) {
 			file = file.substr(2);
@@ -82,7 +72,7 @@ class Webpack {
 				break;
 			}
 		}
-		
+
 		if (directory != '') {
 			return './${directory}/${file}';
 		}
