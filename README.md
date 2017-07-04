@@ -46,8 +46,8 @@ module.exports = {
 You can also add some convenience scripts to your `package.json`:
 
     "scripts": {
-        "webpack": "node node_modules/webpack/bin/webpack.js",
-        "watch": "node node_modules/webpack/bin/webpack.js --watch"
+        "webpack": "webpack",
+        "watch": "webpack --watch"
     },
 
 Now you can run:
@@ -59,23 +59,40 @@ Please note `npm run ...` also works just fine.
 
 ### Requiring files
 
-To require files, you can use [`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require) or, on externs you can add `@:jsRequire` metadata.
+Note: you must add `-lib haxe-loader` to your HXML to use the `Webpack` class.
 
-These both generate `require()` statements that webpack will process when it compiles.
+#### Synchronous requires
 
-One problem with `js.Lib.require()` is that it imports relative to the HXML file, rather than relative to the current HX file.  It also cannot be compiled on platforms other than JS.
+To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
+[`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require).
 
-We have a convenience method you can call instead:
+However, those requires are relative to you HXML file! 
+It also cannot be compiled on platforms other than JS.
 
-    Webpack.require('./MyFile.css');
+It is thus recommended to call instead:
 
-This will generate a `js.Lib.require()` call, and the `./` makes it relative to the current `*.hx` file. It will call `js.Lib.require()` on Javascript targets, and be silently ignored on all other targets.  In future we may try to handle require statements for other targets.
+```haxe
+Webpack.require('./MyFile.css');    // requires a CSS loader
+Webpack.require('../locales.json'); // requires to enable JS loader for JSON
+```
 
-Please note when you compile through webpack, the `Webpack` class is made available.
-If you try to compile the hxml file directly though, or use the hxml file for completion, it may not know where to find the `Webpack.hx` file.
-You can add the class path to your hxml file:
+It is silently ignored on non-JS targets. 
+In future we may try to handle require statements for other targets.
 
-    -cp node_modules/haxe-loader/haxelib
+#### Asynchronous requires (code splitting)
+
+To leverage code splitting, you must use the `Webpack.async` require, 
+and provide the Haxe module you want to load as a separate bundle:
+
+```haxe
+import com.MyComponent;
+...
+Webpack.async(MyComponent).then(function(_){
+    var comp = new myComponent();
+});
+```
+
+Using this API, the Haxe compiler output will be processed and cut into separate files.
 
 ### Dev server setup
 
