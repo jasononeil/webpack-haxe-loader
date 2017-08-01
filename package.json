@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "hash-sum": "^1.0.2",
-    "haxe-modular": "git://github.com/elsassph/haxe-modular.git#feature/webpack",
+    "haxe-modular": "git://github.com/elsassph/haxe-modular.git#feature/webpack_refactoring",
     "tmp": "0.0.31",
     "loader-utils": "^1.1.0"
   }
