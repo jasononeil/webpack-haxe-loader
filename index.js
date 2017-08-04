@@ -59,7 +59,7 @@ function processOutput(ns, jsTempFile, jsOutputFile, mainClass) {
     const content = fs.readFileSync(jsTempFile.path);
     // Check whether the output has changed since last build
     const contentHash = hash(content);
-    if (cache[ns] && cache[ns].hash === contentHash) 
+    if (cache[ns] && cache[ns].hash === contentHash)
         return null;
 
     // Split output
@@ -67,7 +67,7 @@ function processOutput(ns, jsTempFile, jsOutputFile, mainClass) {
     const debug = fs.existsSync(`${jsTempFile.path}.map`);
     const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true)
         .filter(entry => entry && entry.source);
-    
+
     // Inject .hx sources in map file
     results.forEach(entry => {
         if (entry.map) {
@@ -85,7 +85,7 @@ function processOutput(ns, jsTempFile, jsOutputFile, mainClass) {
 
     // Delete temp files
     jsTempFile.cleanup();
-    
+
     return { contentHash, results };
 }
 
@@ -169,6 +169,7 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
     args.push('-D', `webpack_namespace=${ns}`);
 
     // Process all of the args in the hxml file.
+    var flattenClassNames = true;
     for (let line of hxmlContent.split('\n')) {
         line = line.trim();
         if (line === '' || line.substr(0, 1) === '#') {
@@ -195,12 +196,21 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
                 args.push(jsTempFile.path);
                 continue;
             }
-            
+
             if (name === '-cp') {
                 classpath.push(path.resolve(value));
             }
+
+            if (name === '-D' && value === 'js-unflatten') {
+                flattenClassNames = false;
+            }
+
             args.push(value);
         }
+    }
+
+    if (flattenClassNames) {
+        mainClass = mainClass.replace('.', '_');
     }
 
     if (options.extra) args.push(options.extra);
