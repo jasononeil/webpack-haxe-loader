@@ -66,7 +66,7 @@ Note: you must add `-lib haxe-loader` to your HXML to use the `Webpack` class.
 To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
 [`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require).
 
-However, those requires are relative to you HXML file! 
+However, those requires are relative to you HXML file!
 It also cannot be compiled on platforms other than JS.
 
 It is thus recommended to call instead:
@@ -76,12 +76,12 @@ Webpack.require('./MyFile.css');    // requires a CSS loader
 Webpack.require('../locales.json'); // requires to enable JS loader for JSON
 ```
 
-It is silently ignored on non-JS targets. 
+It is silently ignored on non-JS targets.
 In future we may try to handle require statements for other targets.
 
 #### Asynchronous requires (code splitting)
 
-To leverage code splitting, you must use the `Webpack.async` require, 
+To leverage code splitting, you must use the `Webpack.async` require,
 and provide the Haxe module you want to load as a separate bundle:
 
 ```haxe
@@ -132,6 +132,33 @@ If you have a backend you want to use, for example Nekotools running on `http://
         publicPath: "/js/"
     },
 
-### Copyright and License
+### Contributing
 
-Created by Jason O'Neil in 2017.  Released under the MIT license.
+Don't hesitate to create a pull request. Every contribution is appreciated.
+
+## Maintainers
+
+<table>
+  <tbody>
+    <tr>
+      <td align="center">
+        <a href="https://github.com/jasononeil">
+          <img width="150" height="150" src="https://github.com/jasononeil.png?v=3&s=150">
+          </br>
+          Jason O'Neil
+        </a>
+      </td>
+      <td align="center">
+        <a href="https://github.com/elsassph">
+          <img width="150" height="150" src="https://github.com/elsassph.png?v=3&s=150">
+          </br>
+          Philippe Elsass
+        </a>
+      </td>
+    </tr>
+  <tbody>
+</table>
+
+### License
+
+MIT
