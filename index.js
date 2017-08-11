@@ -25,7 +25,7 @@ module.exports = function(hxmlContent) {
 
     const ns = path.basename(request).replace('.hxml', '');
     const jsTempFile = makeJSTempFile(ns);
-    const { jsOutputFile, classpath, args, mainClass } = prepare(context, ns, hxmlContent, jsTempFile);
+    const { jsOutputFile, classpath, args } = prepare(context, ns, hxmlContent, jsTempFile);
 
     registerDepencencies(context, classpath);
 
@@ -43,7 +43,7 @@ module.exports = function(hxmlContent) {
         }
 
         // Read the resulting JS file and return the main module
-        const processed = processOutput(ns, jsTempFile, jsOutputFile, mainClass);
+        const processed = processOutput(ns, jsTempFile, jsOutputFile);
         if (processed) {
             updateCache(context, ns, processed, classpath);
         }
@@ -55,7 +55,7 @@ function updateCache(context, ns, { contentHash, results }, classpath) {
     cache[ns] = { contentHash, results, classpath };
 }
 
-function processOutput(ns, jsTempFile, jsOutputFile, mainClass) {
+function processOutput(ns, jsTempFile, jsOutputFile) {
     const content = fs.readFileSync(jsTempFile.path);
     // Check whether the output has changed since last build
     const contentHash = hash(content);
@@ -63,7 +63,7 @@ function processOutput(ns, jsTempFile, jsOutputFile, mainClass) {
         return null;
 
     // Split output
-    const modules = [mainClass].concat(findImports(content));
+    const modules = findImports(content);
     const debug = fs.existsSync(`${jsTempFile.path}.map`);
     const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true)
         .filter(entry => entry && entry.source);
@@ -169,7 +169,6 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
     args.push('-D', `webpack_namespace=${ns}`);
 
     // Process all of the args in the hxml file.
-    var flattenClassNames = true;
     for (let line of hxmlContent.split('\n')) {
         line = line.trim();
         if (line === '' || line.substr(0, 1) === '#') {
@@ -183,9 +182,6 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
         if (name === '--next') {
             var err = `${context.resourcePath} included a "--next" line, hxml-loader only supports a single build per hxml file.`;
             throw new Error(err);
-        }
-        if (name == '-main') {
-            mainClass = line.substr(space + 1);
         }
 
         if (space > -1) {
@@ -201,19 +197,11 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
                 classpath.push(path.resolve(value));
             }
 
-            if (name === '-D' && value === 'js-unflatten') {
-                flattenClassNames = false;
-            }
-
             args.push(value);
         }
     }
 
-    if (flattenClassNames) {
-        mainClass = mainClass.replace('.', '_');
-    }
-
     if (options.extra) args.push(options.extra);
 
-    return { jsOutputFile, classpath, args, mainClass };
+    return { jsOutputFile, classpath, args };
 }
