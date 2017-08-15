@@ -8,6 +8,10 @@
     "type": "git",
     "url": "https://github.com/jasononeil/webpack-haxe-loader.git"
   },
+  "files": [
+    "index.js",
+    "README.md"
+  ],
   "dependencies": {
     "hash-sum": "^1.0.2",
     "haxe-modular": "^0.3.0",
