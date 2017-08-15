@@ -1,7 +1,7 @@
 {
   "name": "haxe-loader",
   "description": "Make loader-utils a real dependency",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "author": "Jason O'Neil <jason.oneil@gmail.com>",
   "license": "MIT",
   "repository": {
