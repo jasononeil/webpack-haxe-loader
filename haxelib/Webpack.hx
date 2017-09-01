@@ -7,7 +7,7 @@ using StringTools;
 
 class Webpack {
 	/**
-	 * JavaScript 'require' function, for synchronous module loading
+	 * JavaScript `require` function, for synchronous module loading
 	 */
 	public static macro function require(file:String):ExprOf<Dynamic> {
 		if (Context.defined('js')) {
@@ -27,7 +27,7 @@ class Webpack {
 	}
 
 	/**
-	 * JavaScript 'import' function, for asynchronous module loading
+	 * JavaScript `System.import` function, for asynchronous module loading
 	 */
 	public static macro function async(classRef:Expr) {
 		switch (Context.typeof(classRef)) {
@@ -35,10 +35,19 @@ class Webpack {
 				var module = t.module.split('.').join('_');
 				var ns = Context.definedValue('webpack_namespace');
 				var query = '!haxe-loader?$ns/$module!';
+				var link = macro untyped $i{module} = $p{["$s", module]};
 				return macro {
+					#if debug
+					if (untyped module.hot) {
+						untyped module.hot.accept($v{query}, function() {
+							untyped require($v{query});
+							$link;
+						});
+					}
+					#end
 					untyped __js__('System.import')($v{query})
 						.then(function(exports) {
-							untyped $i{module} = $p{["$s", module]};
+							$link;
 							return exports;
 						});
 				}
@@ -46,13 +55,6 @@ class Webpack {
 		}
 		Context.fatalError('A module class reference is required', Context.currentPos());
 		return macro {};
-	}
-
-	/**
-	 * JavaScript 'module.exports' helper
-	 */
-	public static macro function export(expr:Expr) {
-		return macro untyped module.exports = $expr;
 	}
 
 	#if macro
