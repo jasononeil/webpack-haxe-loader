@@ -81,13 +81,13 @@ In future we may try to handle require statements for other targets.
 
 #### Asynchronous requires (code splitting)
 
-To leverage code splitting, you must use the `Webpack.async` require,
+To leverage code splitting, you must use the `Webpack.load` require,
 and provide the Haxe module you want to load as a separate bundle:
 
 ```haxe
 import com.MyComponent;
 ...
-Webpack.async(MyComponent).then(function(_){
+Webpack.load(MyComponent).then(function(_){
     var comp = new myComponent();
 });
 ```
