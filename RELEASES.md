@@ -1,5 +1,9 @@
 # Release Notes
 
+## Next
+
+- **HAXELIB** Updated haxelib release (0.2.0)
+
 ## 0.4.0
 
 - **NEW** React HMR (Hot Module Replacement) support.  This allows you to deep refresh the provided React component when a module is reloaded.
