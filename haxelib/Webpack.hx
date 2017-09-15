@@ -59,6 +59,13 @@ class Webpack {
 
 	#if macro
 	static function rebaseRelativePath(directory:String, file:String) {
+		// make base path relative
+		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
+			var cwd = Sys.getCwd().replace('\\', '/');
+			if (directory.startsWith(cwd))
+				directory = './${directory.substr(cwd.length)}';
+		}
+
 		if (file.startsWith('./')) {
 			file = file.substr(2);
 			return './${directory}/${file}';
