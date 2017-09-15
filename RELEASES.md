@@ -2,7 +2,10 @@
 
 ## Next
 
+- **HAXELIB** Updated haxelib release (0.2.1)
+	- Hotfix for relative paths on Windows. See https://github.com/jasononeil/webpack-haxe-loader/pull/8
 - **HAXELIB** Updated haxelib release (0.2.0)
+	- Rename `Webpack.async()` to `Webpack.load()`
 
 ## 0.4.0
 
