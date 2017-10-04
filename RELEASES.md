@@ -2,6 +2,9 @@
 
 ## Next
 
+## 0.4.1
+
+- **IMPROVED** Update to haxe-module 0.6.0, which fixed the error "Expecting single root statement in program". See https://github.com/jasononeil/webpack-haxe-loader/issues/7
 - **HAXELIB** Updated haxelib release (0.2.1)
 	- Hotfix for relative paths on Windows. See https://github.com/jasononeil/webpack-haxe-loader/pull/8
 - **HAXELIB** Updated haxelib release (0.2.0)
