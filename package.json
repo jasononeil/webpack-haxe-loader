@@ -14,7 +14,7 @@
   ],
   "dependencies": {
     "hash-sum": "^1.0.2",
-    "haxe-modular": "^0.4.0",
+    "haxe-modular": "^0.6.0",
     "loader-utils": "^1.1.0",
     "tmp": "0.0.31"
   }
