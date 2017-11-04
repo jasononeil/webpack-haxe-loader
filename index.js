@@ -12,6 +12,7 @@ const cache = Object.create(null);
 
 module.exports = function(hxmlContent) {
     const context = this;
+    const options = loaderUtils.getOptions(context) || {};
     context.cacheable && context.cacheable();
     const cb = context.async();
 
@@ -25,7 +26,7 @@ module.exports = function(hxmlContent) {
 
     const ns = path.basename(request).replace('.hxml', '');
     const jsTempFile = makeJSTempFile(ns);
-    const { jsOutputFile, classpath, args } = prepare(context, ns, hxmlContent, jsTempFile);
+    const { jsOutputFile, classpath, args } = prepare(options, context, ns, hxmlContent, jsTempFile);
 
     registerDepencencies(context, classpath);
 
@@ -36,10 +37,16 @@ module.exports = function(hxmlContent) {
             return cb(err);
         }
 
+        // If the hxml file outputs something other than client JS, we should not include it in the bundle.
+        // We're only passing it through webpack so that we get `watch` and the like to work.
         if (!jsOutputFile) {
-            // If the hxml file outputs something other than JS, we should not include it in the bundle.
-            // We're only passing it through webpack so that we get `watch` and the like to work.
-            return cb(null, "");
+            // We allow the user to configure a timeout so the server has a chance to restart before webpack triggers a page refresh.
+            var delay = options.delayForNonJsBuilds || 0;
+            setTimeout(() => {
+                // We will include a random string in the output so that the dev server notices a difference and triggers a page refresh.
+                cb(null, "// " + Math.random())
+            }, delay);
+            return;
         }
 
         // Read the resulting JS file and return the main module
@@ -155,8 +162,7 @@ function registerDepencencies(context, classpath) {
     classpath.forEach(path => context.addContextDependency(path));
 }
 
-function prepare(context, ns, hxmlContent, jsTempFile) {
-    const options = loaderUtils.getOptions(context) || {};
+function prepare(options, context, ns, hxmlContent, jsTempFile) {
     const args = [];
     const classpath = [];
     let jsOutputFile = null;
