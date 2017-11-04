@@ -1,7 +1,7 @@
 {
   "name": "haxe-loader",
   "description": "A webpack loader allowing you to compile Haxe as part of your Webpack build",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "author": "Jason O'Neil <jason.oneil@gmail.com>",
   "license": "MIT",
   "repository": {
