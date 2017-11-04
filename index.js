@@ -161,6 +161,7 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
     const classpath = [];
     let jsOutputFile = null;
     let mainClass = 'Main';
+    let isNodeJs = false;
 
     // Add args that are specific to hxml-loader
     if (options.debug) {
@@ -187,7 +188,7 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
         if (space > -1) {
             let value = line.substr(space + 1).trim();
 
-            if (name === '-js') {
+            if (name === '-js' && !isNodeJs) {
                 jsOutputFile = value;
                 args.push(jsTempFile.path);
                 continue;
@@ -195,6 +196,15 @@ function prepare(context, ns, hxmlContent, jsTempFile) {
 
             if (name === '-cp') {
                 classpath.push(path.resolve(value));
+            }
+
+            if (name === '-lib' && value == 'hxnodejs') {
+                isNodeJs = true;
+                if (jsOutputFile) {
+                    // If a JS output file was already set to use a webpack temp file, go back and undo that.
+                    args = args.map(arg => (arg === jsTempFile.path) ? value : arg);
+                    jsOutputFile = null;
+                }
             }
 
             args.push(value);
