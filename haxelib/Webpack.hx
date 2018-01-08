@@ -48,6 +48,7 @@ class Webpack {
 					untyped __js__('System.import')($v{query})
 						.then(function(exports) {
 							$link;
+							var _ = untyped $i{module}; // forced reference
 							return exports;
 						});
 				}
