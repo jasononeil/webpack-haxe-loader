@@ -147,9 +147,12 @@ This way you can have webpack watch, rebuild and refresh your page for PHP, Node
 
 When you use this option, Haxe will output the compilation files specified in your hxml file, but Webpack will still emit a JS bundle.
 For example, you might end up with a file named `php-server.bundle.js`.
-If you look inside, you'll realise that this file contains nothing other than some webpack boilerplate.
+If you look inside, you'll realise that this stub file contains nothing other than some webpack boilerplate.
 You do not need to include this file as a script in your HTML.
 If you do however, webpack-dev-server will know to refresh the page every time the PHP files are rebuilt.
+
+When using NodeJS, by default it will be processed with webpack and output a meaningful file.
+If you would like to not process your server with NodeJS, but still watch for changes and trigger builds, you can add `-D prevent-webpack-js-output` to your NodeJS hxml file, and builds will occur but only a stub-bundle will be emitted.
 
 If you are using NodeJS as a server, and would like it to restart after a compilation, you can use "nodemon":
 
