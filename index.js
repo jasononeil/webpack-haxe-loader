@@ -7,8 +7,11 @@ const exec = require('child_process').exec;
 const tmp = require('tmp');
 const hash = require('hash-sum');
 const split = require('haxe-modular/tool/bin/split');
+const hooks = require('haxe-modular/bin/hooks');
 
 const cache = Object.create(null);
+// resolve hooks once
+const graphHooks = hooks.getGraphHooks();
 
 module.exports = function(hxmlContent) {
     const context = this;
@@ -72,7 +75,7 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
     // Split output
     const modules = findImports(content);
     const debug = fs.existsSync(`${jsTempFile.path}.map`);
-    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true)
+    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true, false, false, graphHooks)
         .filter(entry => entry && entry.source);
 
     // Inject .hx sources in map file

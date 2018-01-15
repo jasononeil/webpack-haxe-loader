@@ -33,8 +33,7 @@ class Webpack {
 		switch (Context.typeof(classRef)) {
 			case haxe.macro.Type.TType(_.get() => t, _):
 				var module = t.module.split('.').join('_');
-				var ns = Context.definedValue('webpack_namespace');
-				var query = '!haxe-loader?$ns/$module!';
+				var query = resolveModule(module);
 				var link = macro untyped $i{module} = $p{["$s", module]};
 				return macro {
 					#if debug
@@ -58,7 +57,23 @@ class Webpack {
 		return macro {};
 	}
 
+	public static macro function loadModule(name:Expr) {
+		switch (name.expr) {
+			case EConst(CString(module)):
+				var query = resolveModule(module);
+				return macro untyped __js__('System.import')($v{query});
+			default:
+		}
+		Context.fatalError('A String literal is required', Context.currentPos());
+		return macro {};
+	}
+
 	#if macro
+	static function resolveModule(name:String) {
+		var ns = Context.definedValue('webpack_namespace');
+		return '!haxe-loader?$ns/$name!';
+	}
+
 	static function rebaseRelativePath(directory:String, file:String) {
 		// make base path relative
 		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
