@@ -5,7 +5,7 @@
   "classPath": "haxelib/",
   "tags": ["webpack", "js"],
   "description": "Haxe loader for webpack",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "releasenote": "See RELEASES.md",
   "contributors": ["jason", "elsassph"]
 }
