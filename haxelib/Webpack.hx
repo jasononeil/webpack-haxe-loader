@@ -27,14 +27,18 @@ class Webpack {
 	}
 
 	/**
-	 * JavaScript `System.import` function, for asynchronous module loading
+	 * Load a Haxe class asynchronously, using haxe-modular code splitting to separate it from the main bundle.
+	 * 
+	 * This will use `System.import()` to have webpack load it asynchronously.
+	 * 
+	 * @param classRef The Haxe class or type you wish to load asynchronously
+	 * @return A `js.Promise` that will complete when the module is loaded. See README for information on how to use.
 	 */
 	public static macro function load(classRef:Expr) {
 		switch (Context.typeof(classRef)) {
 			case haxe.macro.Type.TType(_.get() => t, _):
 				var module = t.module.split('.').join('_');
-				var ns = Context.definedValue('webpack_namespace');
-				var query = '!haxe-loader?$ns/$module!';
+				var query = resolveModule(module);
 				var link = macro untyped $i{module} = $p{["$s", module]};
 				return macro {
 					#if debug
@@ -58,7 +62,33 @@ class Webpack {
 		return macro {};
 	}
 
+	/**
+	 * Load a manually controlled bundle using it's bundle identifier.
+	 * 
+	 * With haxe-modular it is possible to manually control which modules are split into separate bundles.
+	 * This is useful if your project makes heavy use of reflection, which will limit the effectiveness of 
+	 * automatic code-splitting. See https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
+	 * 
+	 * @param name The unique name of the manually configured haxe-modular bundle you wish to load. Must be a constant string.
+	 * @return A `js.Promise` that will resolve with the loaded module. See the link above for details on usage.
+	 */
+	public static macro function loadModule(name:Expr) {
+		switch (name.expr) {
+			case EConst(CString(module)):
+				var query = resolveModule(module);
+				return macro untyped __js__('System.import')($v{query});
+			default:
+		}
+		Context.fatalError('A String literal is required', Context.currentPos());
+		return macro {};
+	}
+
 	#if macro
+	static function resolveModule(name:String) {
+		var ns = Context.definedValue('webpack_namespace');
+		return '!haxe-loader?$ns/$name!';
+	}
+
 	static function rebaseRelativePath(directory:String, file:String) {
 		// make base path relative
 		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
