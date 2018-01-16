@@ -2,6 +2,11 @@
 
 ## Next
 
+## 0.7.0
+
+- ✨: Add `Webpack.loadModule()` to be used in combination with haxe-modular manual code splitting. See https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
+- ✅: Upgraded to haxe-modular 0.9.2 for the change above, as well as improved build times.
+
 ## 0.6.0
 
 - 💔: Revert change from 0.5.0. Now, as was the case in 0.4.1, NodeJS files will

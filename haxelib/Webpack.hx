@@ -28,9 +28,9 @@ class Webpack {
 
 	/**
 	 * Load a Haxe class asynchronously, using haxe-modular code splitting to separate it from the main bundle.
-	 * 
+	 *
 	 * This will use `System.import()` to have webpack load it asynchronously.
-	 * 
+	 *
 	 * @param classRef The Haxe class or type you wish to load asynchronously
 	 * @return A `js.Promise` that will complete when the module is loaded. See README for information on how to use.
 	 */
@@ -64,11 +64,11 @@ class Webpack {
 
 	/**
 	 * Load a manually controlled bundle using it's bundle identifier.
-	 * 
+	 *
 	 * With haxe-modular it is possible to manually control which modules are split into separate bundles.
-	 * This is useful if your project makes heavy use of reflection, which will limit the effectiveness of 
+	 * This is useful if your project makes heavy use of reflection, which will limit the effectiveness of
 	 * automatic code-splitting. See https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
-	 * 
+	 *
 	 * @param name The unique name of the manually configured haxe-modular bundle you wish to load. Must be a constant string.
 	 * @return A `js.Promise` that will resolve with the loaded module. See the link above for details on usage.
 	 */

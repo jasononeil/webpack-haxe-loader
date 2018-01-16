@@ -100,7 +100,10 @@ Webpack.load(MyComponent).then(function(_){
 });
 ```
 
-Using this API, the Haxe compiler output will be processed and cut into separate files.
+Using this API, the Haxe compiler output will be processed and split into separate files.
+
+If you are using controlled bundling to manually split the code with haxe-modular, you can also use `Webpack.loadModule('my_module_identifier')` to asynchronously load your manually configured bundle.
+For further information see https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
 
 ### Dev server setup
 
