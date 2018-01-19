@@ -24,9 +24,9 @@ hash-sum@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/hash-sum/-/hash-sum-1.0.2.tgz#33b40777754c6432573c120cc3808bbd10d47f04"
 
-haxe-modular@^0.9.2:
-  version "0.9.2"
-  resolved "https://registry.yarnpkg.com/haxe-modular/-/haxe-modular-0.9.2.tgz#51ebfaf7def22d30ecfc319dcdb676061b154921"
+haxe-modular@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/haxe-modular/-/haxe-modular-0.9.3.tgz#7313d991a813a61d8fabd887d6412f5fd6e6517e"
   dependencies:
     acorn "^5.2.1"
     graphlib "^2.1.1"

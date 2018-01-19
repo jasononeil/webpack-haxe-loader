@@ -2,6 +2,10 @@
 
 ## Next
 
+## 0.7.1
+
+- 🐛: Upgrade to Haxe Modular 0.9.3 as the 0.9.2 release was buggy.
+
 ## 0.7.0
 
 - ✨: Add `Webpack.loadModule()` to be used in combination with haxe-modular manual code splitting. See https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
