@@ -1,4 +1,4 @@
-# Why using Webpack?
+# Why using Webpack for Haxe developers?
 
 There are several reasons for doing this:
 
@@ -14,9 +14,10 @@ There are several reasons for doing this:
 
 With this loader, you are able to:
 
-- Require a HXML file as any other asset in Webpack.
-- Change any `*.hx` source file from your classpath, and have Haxe re-compile, 
-  Webpack re-bundle, and the browser refresh automatically as soon as you save.
+- Require a HXML file as any other asset in Webpack,
+- Change any HX source file from your classpath, and have Haxe re-compile, 
+  Webpack re-bundle, and the browser refresh automatically as soon as you save,
+- Change any CSS file, and see Webpack refresh the styles (with `hot` devServer option).
 
 If you try to build a hxml file that is for another target, like Neko, PHP or CPP, 
 the compilation will be executed and an empty JS file will be passed on to Webpack, 
@@ -67,8 +68,9 @@ Add some configuration to your `webpack.config.js`:
 
     devServer: {
         contentBase: "./www",   // Your web root is in the "www" folder
-        publicPath: "/assets/", // The JS or assets webpack is building are in "www/assets"
-        overlay: true           // Display compilation errors in the browser
+        publicPath: "/assets/", // If you have chose a custom folder for the output
+        overlay: true,          // Display compilation errors in the browser
+        hot: true               // Hot-reload modules if possible (like CSS)
     },
 
 Add a script to your `package.json`:
@@ -77,21 +79,22 @@ Add a script to your `package.json`:
         "start": "webpack-dev-server --open",
     },
 
-Run `yarn run start` to start the development server.
+Run `yarn run start` to start the development server (`--open` will also open a browser).
 
-If you have a dev backend you want to use, for example Nekotools running 
-on `http://localhost:2000`, webpack-dev-server comes with a proxy:
+Additionally, if you have a dev backend you want to proxy, for example Nekotools running 
+on http://localhost:2000, `webpack-dev-server` comes with a proxy:
 
     devServer: {
         contentBase: "./www", // The server will run from this directory
-        overlay: true, // If there are errors while rebuilding they will be overlayed on the page
+        overlay: true,        // Show build errors in an overlay
         proxy: { // Proxy all requests to localhost:2000
             "/": {
                 changeOrigin: true,
                 target: "http://localhost:2000"
             }
         },
-        publicPath: "/js/" // Webpack assets are compiled to this folder, these will be intercepted by the dev server (and not proxied).
+        publicPath: "/js" // Webpack assets are compiled to this folder, 
+                          // these will be intercepted by the dev server (and not proxied).
     },
 
 ## Compiling non-JS assets
@@ -115,8 +118,9 @@ you can use "nodemon":
 
     nodemon server.js
 
-Given that there will be a delay between Haxe finishing building "server.js" and nodemon restarting the server, you may wish to delay webpack refreshing the page.
-You can specify a delay in milliseconds using the "delayForNonJsBuilds" option:
+Given that there will be a delay between Haxe finishing building "server.js" and nodemon 
+restarting the server, you may wish to delay webpack refreshing the page. You can specify 
+a delay in milliseconds using the "delayForNonJsBuilds" option:
 
 ```js
     module: {
