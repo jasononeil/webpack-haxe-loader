@@ -91,11 +91,11 @@ Notes:
 - you can NOT use `--next` to specify multiple builds in one HXML.
 
 
-### Requiring files
+## Requiring files
 
 Note: you must add `-lib haxe-loader` to your HXML to use the `Webpack` class.
 
-#### Synchronous requires
+### Synchronous requires
 
 To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
 [`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require).
@@ -113,7 +113,7 @@ Webpack.require('../locales.json'); // requires a JSON file in the parent direct
 It is silently ignored on non-JS targets.
 In future we may try to handle require statements for other targets.
 
-#### Asynchronous requires (code splitting)
+### Asynchronous requires (code splitting)
 
 To leverage code splitting, you must use the `Webpack.load` require,
 and provide the Haxe module you want to load as a separate bundle:
