@@ -1,4 +1,4 @@
-# Why using Webpack?
+# Why using Webpack?
 
 There are several reasons for doing this:
 
