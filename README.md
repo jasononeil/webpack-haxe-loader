@@ -129,6 +129,9 @@ Webpack.load(MyComponent).then(function(_){
 Using this API, the Haxe compiler output will be processed and cut into separate files,
 and Webpack will emit separate bundles with these files and their required dependencies.
 
+Haxe Loader offers and advanced API to control Haxe code splitting. For further information see: 
+https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
+
 ### Contributing
 
 Don't hesitate to create a pull request. Every contribution is appreciated.

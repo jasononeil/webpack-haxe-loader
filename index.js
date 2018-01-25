@@ -7,8 +7,11 @@ const exec = require('child_process').exec;
 const tmp = require('tmp');
 const hash = require('hash-sum');
 const split = require('haxe-modular/tool/bin/split');
+const hooks = require('haxe-modular/bin/hooks');
 
 const cache = Object.create(null);
+// resolve hooks once
+const graphHooks = hooks.getGraphHooks();
 
 module.exports = function(hxmlContent) {
     const context = this;
@@ -72,7 +75,7 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
     // Split output
     const modules = findImports(content);
     const debug = fs.existsSync(`${jsTempFile.path}.map`);
-    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true)
+    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true, false, false, graphHooks)
         .filter(entry => entry && entry.source);
 
     // Inject .hx sources in map file
@@ -163,11 +166,11 @@ function registerDepencencies(context, classpath) {
 }
 
 function prepare(options, context, ns, hxmlContent, jsTempFile) {
-    const args = [];
+    let args = [];
     const classpath = [];
     let jsOutputFile = null;
     let mainClass = 'Main';
-    let isNodeJs = false;
+    let preventJsOutput = false;
 
     // Add args that are specific to hxml-loader
     if (options.debug) {
@@ -194,7 +197,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         if (space > -1) {
             let value = line.substr(space + 1).trim();
 
-            if (name === '-js' && !isNodeJs) {
+            if (name === '-js' && !preventJsOutput) {
                 jsOutputFile = value;
                 args.push(jsTempFile.path);
                 continue;
@@ -204,8 +207,8 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
                 classpath.push(path.resolve(value));
             }
 
-            if (name === '-lib' && value == 'hxnodejs') {
-                isNodeJs = true;
+            if (name === '-D' && value == 'prevent-webpack-js-output') {
+                preventJsOutput = true;
                 if (jsOutputFile) {
                     // If a JS output file was already set to use a webpack temp file, go back and undo that.
                     args = args.map(arg => (arg === jsTempFile.path) ? value : arg);
