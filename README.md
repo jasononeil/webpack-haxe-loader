@@ -1,73 +1,95 @@
+# Haxe Loader for Webpack
+
 [![npm Version](https://img.shields.io/npm/v/haxe-loader.svg)](https://www.npmjs.com/package/haxe-loader)
 [![Downloads](http://img.shields.io/npm/dm/haxe-loader.svg)](https://npmjs.org/package/haxe-loader)
 [![Join the chat at https://gitter.im/haxe-react/haxe-modular](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/haxe-react/haxe-modular)
 
-# Haxe Loader for Webpack
+This is the [Haxe](https://haxe.org) loader for Webpack.
 
-This loader allows you to load hxml files directly into webpack, and included the Haxe-compiled Javascript result directly in your bundle.
+If you're unsure why you should be using Webpack, read 
+[an introduction to Webpack for Haxe developers](webpack.md).
 
-There are several reasons for doing this:
+## Getting Started
 
-- If you are going to use NPM libraries as externs, you need to compile with Webpack or Browserify etc. Having the two compile steps (Haxe and Webpack) makes it easier.
-- There's a good chance you'll want webpack anyway for compiling CSS (or SASS or LESS), managing static assets, or minifying the resulting JS bundle.
-- When Webpack is set up right, it has a nice development experience, with things like:
-    - `webpack --watch` to watch any changes you make to a file and recompile.
-    - `webpack-dev-server` to hot-reload a page based on changes you make.
+### Examples
 
-With this loader, you are able to:
+There is a small example Haxe+Webpack project presenting 
+[vanilla DOM](https://github.com/elsassph/webpack-haxe-example) 
+and [React](https://github.com/elsassph/webpack-haxe-example/tree/react) approaches.
+These examples gives you a sample functional Webpack config, a couple of classes and leverage
+Webpack features like:
 
-- Use a `hxml` file as the entry point for your build.
-- Change any `*.hx` source file, and have haxe re-compile, webpack re-bundle, and the browser refresh automatically as soon as you save.
+- loading images, styles and configuration,
+- code splitting,
+- and hot-module replacement (with React).
 
-Currently the loader only supports HXML files which export exactly one output, so you cannot use `--next` to build multiple things.  Instead you can use multiple hxml files and list each of them in Webpack.
+### Installation
 
-If you try to build a hxml file that is for another target, like Neko, PHP or CPP - the hxml file will be executed and an empty JS file will be passed on to webpack, which you can safely ignore - see below for details.
+    yarn add haxe-loader
 
-### Example webpack configuration
+or
+
+    npm install haxe-loader --save
+
+You will also need to install Haxe 3 if you don't have it already: https://haxe.org/download/
+
+### Running
+
+Use webpack like normal, including `webpack --watch` and `webpack-dev-server`.
+
+### Compatibility
+
+Haxe Loader is compatible with Webpack 3 (possibly 2) and Haxe 3.2.1 to 3.4.x.
+
+If you notice a compatibility problem, please log an issue.
+
+### Configuration
+
+1. Create or update `webpack.config.js` like so:
 
 ```js
 module.exports = {
-    entry: {
-        client: './client.hxml',
-        server: './server.hxml', // Could compile PHP or Neko etc, does not have to be JS.
-    },
-    output: {
-        path: __dirname + "/www/assets",
-        filename: '[name].bundle.js'
-    },
-    module: {
-        rules: [
-            // Have a rule that explains hxml files should use `haxe-loader`.
-            {
-                test: /\.hxml$/,
-                loader: 'haxe-loader',
-            }
-        ]
-    },
-};
+  devtool: 'inline-source-map',
+  entry: './app.hxml',
+  output: {
+    filename: 'bundle.js'
+  },
+  module: {
+    rules: [
+      // all files with hxml extension will be handled by `haxe-loader`
+      {
+        test: /\.hxml$/, 
+        loader: 'haxe-loader'
+      }
+    ]
+  }
+}
 ```
 
-You can also add some convenience scripts to your `package.json`:
+You'll note that the input is `./app.hxml`, not Haxe code files: this loader will 
+run the Haxe compiler with the HXML parameters, and include the resulting JavaScript 
+into the bundle. 
 
-```json
-    "scripts": {
-        "build": "webpack -p",
-        "start": "webpack-dev-server --open",
-        "server": "cd www && nodemon server.js",
-        "test": "cd www && node test.js",
-        "test_watch": "cd www && nodemon test.js"
-    },
+HXML files can be the bundle entry point, as in this example, or can be "required"
+from JavaScript (ex: `const haxeApp = require('./app.hxml')`).
+
+2. Create an HXML file for your project
+
+HXML files are a way to specify Haxe compiler arguments; for this loader, configure
+the compiler as for any Haxe-JavaScript project, and add `-lib haxe-loader`:
+
+```
+-cp src
+-main Main
+-lib haxe-loader
+-js index.js
 ```
 
-Now you can run:
+Notes: 
 
-    - `yarn build` - Use webpack to build a production copy of your app
-    - `yarn start` - Start the webpack dev server, which will watch for changes, recompile and refresh the browser.
-    - `yarn server` - Start a NodeJS server (if "www/server.js" is a NodeJS file you have compiled)
-    - `yarn test` - Run a test suite once (if "www/test.js" is a NodeJS file you have compiled)
-    - `yarn test_watch` - Build and run a test suite on every change (if "www/test.js" is a NodeJS file you have compiled)
+- the name/path of the JS output doesn't matter, but it has to be present,
+- you can NOT use `--next` to specify multiple builds in one HXML.
 
-Please note `npm run ...` also works just fine.
 
 ### Requiring files
 
@@ -104,74 +126,8 @@ Webpack.load(MyComponent).then(function(_){
 });
 ```
 
-Using this API, the Haxe compiler output will be processed and cut into separate files.
-
-### Dev server setup
-
-You can use [webpack-dev-server](https://webpack.js.org/configuration/dev-server/) to watch changes and auto-refresh a page after Haxe has compiled any changes.
-
-Install `webpack-dev-server`
-
-    yarn add --dev webpack-dev-server    # Or you can `npm install --dev webpack-dev-server`
-
-Add some configuration to your `webpack.config.js`:
-
-    devServer: {
-        contentBase: "./www",   // Your web root is in the "www" folder
-        publicPath: "/assets/", // The JS or assets webpack is building are in "www/assets"
-        overlay: true,          // Display compilation errors in the browser
-    },
-
-Add a script to your `package.json`:
-
-    "scripts": {
-        "start": "webpack-dev-server --open",
-    },
-
-Run `yarn run start` to start the development server.
-
-If you have a backend you want to use, for example Nekotools running on `http://localhost:2000`, webpack-dev-server comes with a proxy:
-
-    devServer: {
-        contentBase: "./www", // The server will run from this directory
-        overlay: true, // If there are errors while rebuilding they will be overlayed on the page
-        proxy: { // Proxy all requests to localhost:2000
-            "/": {
-                changeOrigin: true,
-                target: "http://localhost:2000"
-            }
-        },
-        publicPath: "/js/" // Webpack assets are compiled to this folder, these will be intercepted by the dev server (and not proxied).
-    },
-
-### Compiling non-JS assets
-
-You can use Webpack and haxe-loader to compile all of your hxml files, not just those targeting client side Javascript.
-This way you can have webpack watch, rebuild and refresh your page for PHP, NodeJS, Neko etc.
-
-When you use this option, Haxe will output the compilation files specified in your hxml file, but Webpack will still emit a JS bundle.
-For example, you might end up with a file named `php-server.bundle.js`.
-If you look inside, you'll realise that this file contains nothing other than some webpack boilerplate.
-You do not need to include this file as a script in your HTML.
-If you do however, webpack-dev-server will know to refresh the page every time the PHP files are rebuilt.
-
-If you are using NodeJS as a server, and would like it to restart after a compilation, you can use "nodemon":
-
-    nodemon server.js
-
-Given that there will be a delay between Haxe finishing building "server.js" and nodemon restarting the server, you may wish to delay webpack refreshing the page.
-You can specify a delay in milliseconds using the "delayForNonJsBuilds" option:
-
-```js
-    module: {
-        rules: [
-            {
-                test: /\.hxml$/,
-                use: [{ loader: 'haxe-loader', options: {delayForNonJsBuilds: 300} }],
-            },
-        ],
-    }
-```
+Using this API, the Haxe compiler output will be processed and cut into separate files,
+and Webpack will emit separate bundles with these files and their required dependencies.
 
 ### Contributing
 
