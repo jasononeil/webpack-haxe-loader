@@ -1,3 +1,7 @@
+[![npm Version](https://img.shields.io/npm/v/haxe-loader.svg)](https://www.npmjs.com/package/haxe-loader)
+[![Downloads](http://img.shields.io/npm/dm/haxe-loader.svg)](https://npmjs.org/package/haxe-loader)
+[![Join the chat at https://gitter.im/haxe-react/haxe-modular](https://img.shields.io/badge/gitter-join%20chat-brightgreen.svg)](https://gitter.im/haxe-react/haxe-modular)
+
 # Haxe Loader for Webpack
 
 This loader allows you to load hxml files directly into webpack, and included the Haxe-compiled Javascript result directly in your bundle.
