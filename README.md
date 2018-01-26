@@ -177,7 +177,7 @@ The Haxe Loader supports a number of options:
 
 - `debug`: Haxe debug compilation (emits sourcemaps), and is suitable for hot-module replacement
 - `extra`: Additional Haxe compiler arguments, applied after the HXML file
-- `delayForNonJsBuilds`: See [webpack-tips.md](advanced usage tip with non-JS targets)
+- `delayForNonJsBuilds`: See [advanced usage tip with non-JS targets](webpack-tips.md)
 
 
 ## Contributing
