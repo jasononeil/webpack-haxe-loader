@@ -150,7 +150,7 @@ of sourcemaps. There are 2 steps to getting this set up with haxe-loader and web
 First, for haxe-loader to produce sourcemaps, you have to do a debug Haxe build,
 for that you need to set the `debug` flag in the loader options:
 
-```json
+```js
 {
   test: /\.hxml$/, 
   loader: 'haxe-loader',
