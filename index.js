@@ -82,14 +82,15 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
     results.forEach(entry => {
         if (entry.map) {
             const map = entry.map.content = JSON.parse(entry.map.content);
-            map.sourcesContent = map.sources.map(path => {
-                try {
-                    if (path.startsWith('file:///')) path = path.substr(8);
-                    return fs.readFileSync(path).toString();
-                } catch (_) {
-                    return '';
-                }
-            });
+            map.sourcesContent = map.sources
+                .map(path => getSystemPath(path))
+                .map(path => {
+                    try {
+                        return fs.readFileSync(path).toString();
+                    } catch (_) {
+                        return `/*\n Source not found:\n ${path}\n*/`;
+                    }
+                });
         }
     });
 
@@ -97,6 +98,14 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
     jsTempFile.cleanup();
 
     return { contentHash, results };
+}
+
+function getSystemPath(path) {
+    // remove 'file://' prefix
+    if (path.startsWith('file://')) path = path.substr(7);
+    // Windows path fix
+    if (/^\/[a-z]:/i.test(path)) path = path.substr(1);
+    return path;
 }
 
 function returnModule(context, ns, name, cb) {
