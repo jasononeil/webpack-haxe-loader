@@ -7,7 +7,7 @@
 This is the [Haxe](https://haxe.org) loader for Webpack.
 
 If you're unsure why you should be using Webpack, read 
-[an introduction to Webpack for Haxe developers](webpack.md).
+[an introduction to Webpack for Haxe developers](webpack-tips.md).
 
 ## Getting Started
 
@@ -49,7 +49,7 @@ If you notice a compatibility problem, please log an issue.
 
 ```js
 module.exports = {
-  devtool: 'inline-source-map',
+  devtool: 'cheap-module-eval-source-map',
   entry: './app.hxml',
   output: {
     filename: 'bundle.js'
@@ -59,7 +59,10 @@ module.exports = {
       // all files with hxml extension will be handled by `haxe-loader`
       {
         test: /\.hxml$/, 
-        loader: 'haxe-loader'
+        loader: 'haxe-loader',
+        options: {
+          debug: true
+        }
       }
     ]
   }
@@ -71,7 +74,13 @@ run the Haxe compiler with the HXML parameters, and include the resulting JavaSc
 into the bundle. 
 
 HXML files can be the bundle entry point, as in this example, or can be "required"
-from JavaScript (ex: `const haxeApp = require('./app.hxml')`).
+from JavaScript:
+
+```js
+// in `myscript.js`:
+const haxeApp = require('./app.hxml');
+// haxeApp holds the @:exposed classes/methods of your Haxe JS
+```
 
 2. Create an HXML file for your project
 
@@ -91,11 +100,11 @@ Notes:
 - you can NOT use `--next` to specify multiple builds in one HXML.
 
 
-## Requiring files
+## Webpack require and code splitting
 
 Note: you must add `-lib haxe-loader` to your HXML to use the `Webpack` class.
 
-### Synchronous requires
+### Webpack require
 
 To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
 [`js.Lib.require()`](http://api.haxe.org/js/Lib.html#require).
@@ -103,7 +112,7 @@ To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
 However, those requires are relative to you HXML file!
 It also cannot be compiled on platforms other than JS.
 
-It is thus recommended to call instead:
+For assets/styles, it is thus recommended to call instead:
 
 ```haxe
 Webpack.require('./MyFile.css');    // requires a CSS file in the same directory as the current ".hx" file
@@ -113,10 +122,10 @@ Webpack.require('../locales.json'); // requires a JSON file in the parent direct
 It is silently ignored on non-JS targets.
 In future we may try to handle require statements for other targets.
 
-### Asynchronous requires (code splitting)
+### Code splitting (load on demand)
 
-To leverage code splitting, you must use the `Webpack.load` require,
-and provide the Haxe module you want to load as a separate bundle:
+To leverage code splitting, you must use the `Webpack.load` asynchronous
+require, and provide the Haxe module you want to load as a separate bundle:
 
 ```haxe
 import com.MyComponent;
@@ -132,11 +141,50 @@ and Webpack will emit separate bundles with these files and their required depen
 Haxe Loader offers and advanced API to control Haxe code splitting. For further information see: 
 https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling
 
-### Contributing
+
+## DevTools / source maps
+
+If you want to be able to debug your original source then you can thanks to the magic 
+of sourcemaps. There are 2 steps to getting this set up with haxe-loader and webpack.
+
+First, for haxe-loader to produce sourcemaps, you have to do a debug Haxe build,
+for that you need to set the `debug` flag in the loader options:
+
+```json
+{
+  test: /\.hxml$/, 
+  loader: 'haxe-loader',
+  options: {
+    debug: true
+  }
+}
+```
+
+Second, you need to set the devtool option in your `webpack.config.js` to support the 
+type of sourcemaps you want. To make your choice have a read of the 
+[devtool webpack docs](https://webpack.js.org/configuration/devtool/). 
+
+You may be somewhat daunted by the choice available, so here are some example strategies 
+for different environments:
+
+- `devtool: 'cheap-module-eval-source-map'` - Best support for sourcemaps whilst debugging
+- `devtool: 'source-map'` - Suitable for use in Production
+
+
+## Loader options
+
+The Haxe Loader supports a number of options:
+
+- `debug`: Haxe debug compilation (emits sourcemaps), and is suitable for hot-module replacement
+- `extra`: Additional Haxe compiler arguments, applied after the HXML file
+- `delayForNonJsBuilds`: See [webpack-tips.md](advanced usage tip with non-JS targets)
+
+
+## Contributing
 
 Don't hesitate to create a pull request. Every contribution is appreciated.
 
-## Maintainers
+### Maintainers
 
 <table>
   <tbody>
