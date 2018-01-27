@@ -102,8 +102,6 @@ Notes:
 
 ## Webpack require and code splitting
 
-Note: you must add `-lib haxe-loader` to your HXML to use the `Webpack` class.
-
 ### Webpack require
 
 To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
@@ -112,7 +110,7 @@ To require 3rd party NPM modules, you can use `@:jsRequire` metadata or
 However, those requires are relative to you HXML file!
 It also cannot be compiled on platforms other than JS.
 
-For assets/styles, it is thus recommended to call instead:
+For assets/styles, it is therefore recommended to instead call:
 
 ```haxe
 Webpack.require('./MyFile.css');    // requires a CSS file in the same directory as the current ".hx" file
@@ -183,6 +181,10 @@ The Haxe Loader supports a number of options:
 ## Contributing
 
 Don't hesitate to create a pull request. Every contribution is appreciated.
+
+If you encounter a bug, please open a Github issue. As webpack configuration can differ greatly between projects, it is helpful if you can reproduce the bug using our [example repository](https://github.com/elsassph/webpack-haxe-example) as a starting point.
+
+If you would like to discuss anything with us, we can be contacted on the [haxe-modular Gitter channel](https://gitter.im/haxe-react/haxe-modular).
 
 ### Maintainers
 
