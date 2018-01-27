@@ -1,6 +1,6 @@
-# Why using Webpack for Haxe developers?
+# How is Webpack useful for Haxe developers?
 
-There are several reasons for doing this:
+There are several reasons to use Webpack when working on a Haxe JavaScript project:
 
 - If you are going to use NPM libraries as externs, you need to compile with Webpack or 
   Browserify etc. Having the two compile steps (Haxe and Webpack) makes it easier.
