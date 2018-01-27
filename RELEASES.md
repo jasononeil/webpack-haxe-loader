@@ -2,6 +2,10 @@
 
 ## Next
 
+## 0.7.3
+
+- ✅ Documentation improvements.
+
 ## 0.7.2
 
 - 🐛 Fix sourcemap paths on Mac.
