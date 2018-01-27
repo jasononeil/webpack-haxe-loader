@@ -2,6 +2,11 @@
 
 ## Next
 
+## 0.7.2
+
+- 🐛 Fix sourcemap paths on Mac.
+- 🐛 Fix NPM release - the last release included code that had not been committed to Github.
+
 ## 0.7.1
 
 - 🐛: Upgrade to Haxe Modular 0.9.3 as the 0.9.2 release was buggy.
