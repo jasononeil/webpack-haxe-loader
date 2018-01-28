@@ -29,7 +29,7 @@ Webpack features like:
 
 or
 
-    npm install haxe-loader --save
+    npm install haxe-loader --save-dev
 
 You will also need to install Haxe 3 if you don't have it already: https://haxe.org/download/
 
