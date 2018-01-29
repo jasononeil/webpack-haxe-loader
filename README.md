@@ -25,11 +25,11 @@ Webpack features like:
 
 ### Installation
 
-    yarn add haxe-loader
+    yarn add --dev haxe-loader
 
 or
 
-    npm install haxe-loader --save-dev
+    npm install --save-dev haxe-loader 
 
 You will also need to install Haxe 3 if you don't have it already: https://haxe.org/download/
 
