@@ -4,7 +4,7 @@
 function assertInModule(src, title, tests) {
     tests.forEach(test => {
         if (src.indexOf(test) < 0) {
-            throw `FAILED: ${title} should contain "${test}"`;
+            throw `FAILED: ${title} should contain "${test}"\n\n[...]${src}`;
         }
     });
 }
