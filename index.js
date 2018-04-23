@@ -225,6 +225,12 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
                 }
             }
 
+            if (name == '--macro') {
+                // quote macro value
+                args.push(`"${value}"`);
+                continue;
+            }
+
             args.push(value);
         }
     }
