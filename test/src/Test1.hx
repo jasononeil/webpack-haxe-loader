@@ -1,6 +1,6 @@
 class Test1 {
     static function main() {
-        trace('Test 1 OK');
+        trace('Test1');
         var json = Webpack.require('./test.json');
     }
 }

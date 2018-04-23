@@ -14,18 +14,31 @@ function assertInModule(src, title, tests) {
  */
 function extractModules(src) {
     const reModule = /\/\* ([0-9]+) \*\/\n\/\*\*\*\/ \(function/;
+    return splitSrc(src, reModule);
+}
+
+/**
+ * Extract/butcher individual module source from webpack-generated chunk JS
+ */
+function extractChunks(src) {
+    const reChunk = /\/\*\*\*\/ ([0-9]+):\n\/\*\*\*\/ \(function/;
+    return splitSrc(src, reChunk);
+}
+
+function splitSrc(src, re) {
     let m, last;
     const result = [];
-    while (m = reModule.exec(src)) {
-        if (last) result.push(src.substr(0, m.index));
+    while (m = re.exec(src)) {
+        if (last) result[+last[1]] = src.substr(0, m.index);
         last = m;
         src = src.substr(m.index + m[0].length);
     }
-    if (last) result.push(src);
+    if (last) result[+last[1]] = src;
     return result;
 }
 
 module.exports = {
     assertInModule,
-    extractModules
+    extractModules,
+    extractChunks
 };

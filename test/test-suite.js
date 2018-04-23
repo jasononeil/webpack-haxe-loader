@@ -2,10 +2,10 @@ const path = require('path');
 const chdir = require('process').chdir;
 const exec = require('child_process').exec;
 
-const suite = [ 'test1' ];
+const suite = ['test1', 'test2'];
 
 function validateOutput() {
-    require('./validate-output').run();
+    require('./validate-output');
 }
 
 function runSuite() {

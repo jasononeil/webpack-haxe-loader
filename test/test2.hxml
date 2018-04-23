@@ -1,0 +1,4 @@
+-cp ../haxelib
+-cp src
+-js test.js
+-main Test2.hx
