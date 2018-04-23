@@ -1,7 +1,8 @@
 /**
  * In `src`, match all the cases in `tests`, or throw an error
  */
-function assertInModule(src, title, tests) {
+function assertInModule(index, src, title, tests) {
+    if (!src) throw `FAILED: ${title} does not have a module ${index}`;
     tests.forEach(test => {
         if (src.indexOf(test) < 0) {
             throw `FAILED: ${title} should contain "${test}"\n\n[...]${src}`;

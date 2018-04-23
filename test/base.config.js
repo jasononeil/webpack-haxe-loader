@@ -1,6 +1,7 @@
 const path = require('path');
 
 module.exports = {
+    target: 'node',
     devtool: 'cheap-module-eval-source-map',
     resolveLoader: {
         alias: {
