@@ -225,7 +225,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
                 }
             }
 
-            if (name === '-lib' && value.startsWith('modular')) {
+            if (name === '-lib' && /^modular(:|$)/.test(value)) {
                 throw new Error('When using haxe-loader, you need to remove `-lib modular` from your hxml file');
             }
 
