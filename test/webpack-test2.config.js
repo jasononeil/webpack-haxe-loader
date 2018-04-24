@@ -1,8 +1,9 @@
+const merge = require ('webpack-merge');
+const baseConfig = require('./base.config');
 
-module.exports = Object.assign({}, require('./base.config'), {
+module.exports = merge(baseConfig, {
     entry: './test2.hxml',
     output: {
-        path: `${__dirname}/out/`,
         filename: 'bundle2.js'
     },
 });

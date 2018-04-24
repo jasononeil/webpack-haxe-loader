@@ -1,7 +1,8 @@
 {
   "name": "haxe-loader-test",
   "dependencies": {
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "webpack-merge": "^4.1.2"
   },
   "scripts": {
     "test1": "webpack --config webpack-test1.config.js",
