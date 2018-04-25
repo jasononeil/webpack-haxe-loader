@@ -7,6 +7,7 @@
 * 🐛 Fix issue with macros needing to be wrapped in quotes.
   Macros which use double quotes will still not work until
   (#31)[https://github.com/jasononeil/webpack-haxe-loader/issues/31] is fixed.
+* ✅ Upgraded to haxe-modular 0.10.9, for improved splitting logic
 * ✅ Add console error if using `-lib modular` in combination with webpack-haxe-loader.
 * ✅ Project maintenance: set up Travis CI and automated testing.
 
