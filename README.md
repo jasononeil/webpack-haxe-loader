@@ -25,23 +25,21 @@ Webpack features like:
 
 ### Installation
 
+Instructions assume basic knowledge of Webpack; it is advised to first follow 
+the [Getting started](https://webpack.js.org/guides/getting-started/) guide.
+
     yarn add --dev haxe-loader
 
 or
 
     npm install --save-dev haxe-loader 
 
-You will also need to install Haxe 3 if you don't have it already: https://haxe.org/download/
-
-### Running
-
-Use webpack like normal, including `webpack --watch` and `webpack-dev-server`.
-
 ### Compatibility
 
-Haxe Loader is compatible with Webpack 3 (possibly 2) and Haxe 3.2.1 to 3.4.x.
-
+Haxe Loader is compatible with Webpack 3 and 4, and Haxe 3.4+.
 If you notice a compatibility problem, please log an issue.
+
+You must have Haxe compiler installed: https://haxe.org/download
 
 ### Configuration
 
@@ -80,6 +78,7 @@ from JavaScript:
 // in `myscript.js`:
 const haxeApp = require('./app.hxml');
 // haxeApp holds the @:exposed classes/methods of your Haxe JS
+// e.g.: new haxeApp.MyExposedHaxeClass()
 ```
 
 2. Create an HXML file for your project
@@ -91,13 +90,15 @@ the compiler as for any Haxe-JavaScript project, and add `-lib haxe-loader`:
 -cp src
 -main Main
 -lib haxe-loader
--js index.js
+-js out.js
 ```
 
 Notes: 
 
 - the name/path of the JS output doesn't matter, but it has to be present,
-- you can NOT use `--next` to specify multiple builds in one HXML.
+- HXML files (at the moment) have to reside at the root of the project,
+- you can NOT use `--next` to specify multiple builds in one HXML,
+- you can still use this HXML using the Haxe compiler directly for troubleshooting.
 
 
 ## Webpack require and code splitting
@@ -160,7 +161,7 @@ for that you need to set the `debug` flag in the loader options:
 
 Second, you need to set the devtool option in your `webpack.config.js` to support the 
 type of sourcemaps you want. To make your choice have a read of the 
-[devtool webpack docs](https://webpack.js.org/configuration/devtool/). 
+[Webpack development guide](https://webpack.js.org/guides/development/). 
 
 You may be somewhat daunted by the choice available, so here are some example strategies 
 for different environments:
