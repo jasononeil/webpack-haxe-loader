@@ -1,0 +1,29 @@
+language: haxe
+
+haxe:
+  - 3.4.4
+  - stable
+  - development
+
+matrix:
+  allow_failures:
+    - haxe: development
+
+install:
+  - node -v && npm install
+
+script:
+  - node test/test-suite.js
+
+deploy:
+  - provider: script
+    haxe: 3.4.4
+    script: bash ./releaseHaxelib.sh $HAXELIB_USER $HAXELIB_PWD
+    on:
+      tags: true
+  - provider: npm
+    haxe: 3.4.4
+    email: "$NPM_EMAIL"
+    api_key: $NPM_KEY
+    on:
+      tags: true

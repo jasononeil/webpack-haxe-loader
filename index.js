@@ -57,7 +57,7 @@ module.exports = function(hxmlContent) {
         if (processed) {
             updateCache(context, ns, processed, classpath);
         }
-        returnModule(context, ns, 'Main', cb);
+        returnModule(context, ns, null /* entry point */, cb);
     });
 };
 
@@ -81,7 +81,7 @@ function processOutput(ns, jsTempFile, jsOutputFile) {
     // Inject .hx sources in map file
     results.forEach(entry => {
         if (entry.map) {
-            const map = entry.map.content = JSON.parse(entry.map.content);
+            const map = entry.map.content;
             map.sourcesContent = map.sources
                 .map(path => getSystemPath(path))
                 .map(path => {
@@ -112,6 +112,10 @@ function returnModule(context, ns, name, cb) {
     const { results, classpath } = cache[ns];
     if (!results.length) {
         throw new Error(`${ns}.hxml did not emit any modules`);
+    }
+    if (name == null) {
+        // entry point is always first module
+        name = results[0].name;
     }
 
     const entry = results.find(entry => entry.name === name);
