@@ -6,15 +6,15 @@
 
 This is the [Haxe](https://haxe.org) loader for Webpack.
 
-If you're unsure why you should be using Webpack, read 
+If you're unsure why you should be using Webpack, read
 [an introduction to Webpack for Haxe developers](webpack-tips.md).
 
 ## Getting Started
 
 ### Examples
 
-There is a small example Haxe+Webpack project presenting 
-[vanilla DOM](https://github.com/elsassph/webpack-haxe-example) 
+There is a small example Haxe+Webpack project presenting
+[vanilla DOM](https://github.com/elsassph/webpack-haxe-example)
 and [React](https://github.com/elsassph/webpack-haxe-example/tree/react) approaches.
 These examples gives you a sample functional Webpack config, a couple of classes and leverage
 Webpack features like:
@@ -25,14 +25,14 @@ Webpack features like:
 
 ### Installation
 
-Instructions assume basic knowledge of Webpack; it is advised to first follow 
+Instructions assume basic knowledge of Webpack; it is advised to first follow
 the [Getting started](https://webpack.js.org/guides/getting-started/) guide.
 
     yarn add --dev haxe-loader
 
 or
 
-    npm install --save-dev haxe-loader 
+    npm install --save-dev haxe-loader
 
 ### Compatibility
 
@@ -56,7 +56,7 @@ module.exports = {
     rules: [
       // all files with hxml extension will be handled by `haxe-loader`
       {
-        test: /\.hxml$/, 
+        test: /\.hxml$/,
         loader: 'haxe-loader',
         options: {
           debug: true
@@ -67,9 +67,9 @@ module.exports = {
 }
 ```
 
-You'll note that the input is `./app.hxml`, not Haxe code files: this loader will 
-run the Haxe compiler with the HXML parameters, and include the resulting JavaScript 
-into the bundle. 
+You'll note that the input is `./app.hxml`, not Haxe code files: this loader will
+run the Haxe compiler with the HXML parameters, and include the resulting JavaScript
+into the bundle.
 
 HXML files can be the bundle entry point, as in this example, or can be "required"
 from JavaScript:
@@ -93,7 +93,7 @@ the compiler as for any Haxe-JavaScript project, and add `-lib haxe-loader`:
 -js out.js
 ```
 
-Notes: 
+Notes:
 
 - the name/path of the JS output doesn't matter, but it has to be present,
 - HXML files (at the moment) have to reside at the root of the project,
@@ -138,13 +138,13 @@ Using this API, the Haxe compiler output will be processed and cut into separate
 and Webpack will emit separate bundles with these files and their required dependencies.
 
 - To learn more about the splitting process, see [haxe-modular](https://github.com/elsassph/haxe-modular).
-- An advanced API to control Haxe code splitting is available - see: 
+- An advanced API to control Haxe code splitting is available - see:
 [controlled splitting API](https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling).
 
 
 ## DevTools / source maps
 
-If you want to be able to debug your original source then you can thanks to the magic 
+If you want to be able to debug your original source then you can thanks to the magic
 of sourcemaps. There are 2 steps to getting this set up with haxe-loader and webpack.
 
 First, for haxe-loader to produce sourcemaps, you have to do a debug Haxe build,
@@ -152,7 +152,7 @@ for that you need to set the `debug` flag in the loader options:
 
 ```js
 {
-  test: /\.hxml$/, 
+  test: /\.hxml$/,
   loader: 'haxe-loader',
   options: {
     debug: true
@@ -160,12 +160,12 @@ for that you need to set the `debug` flag in the loader options:
 }
 ```
 
-Second, you need to set the devtool option in your `webpack.config.js` to support the 
-type of sourcemaps you want. To make your choice have a read of the 
-[Webpack development guide](https://webpack.js.org/guides/development/). 
+Second, you need to set the devtool option in your `webpack.config.js` to support the
+type of sourcemaps you want. To make your choice have a read of the
+[Webpack development guide](https://webpack.js.org/guides/development/).
 
-You may be somewhat daunted by the choice available, so here are some example strategies 
-for different environments:
+You may be somewhat overwhelmed by the choice available, so here are some example
+strategies for different environments:
 
 - `devtool: 'cheap-module-eval-source-map'` - Best support for sourcemaps whilst debugging
 - `devtool: 'source-map'` - Suitable for use in Production
@@ -175,10 +175,27 @@ for different environments:
 
 The Haxe Loader supports a number of options:
 
-- `debug`: Haxe debug compilation (emits sourcemaps), and is suitable for hot-module replacement
-- `extra`: Additional Haxe compiler arguments, applied after the HXML file
+- `debug`: *(Boolean)* Haxe debug compilation (emits sourcemaps), and is suitable for hot-module replacement
+- `sizeReport`: *(Boolean)* Generate size report (see below)
+- `extra`: *(String)* Additional Haxe compiler arguments, applied after the HXML file
 - `delayForNonJsBuilds`: See [advanced usage tip with non-JS targets](webpack-tips.md)
 
+
+## Detailed size reporting
+
+Webpack has a number of [size analyser tools](https://survivejs.com/webpack/optimizing/build-analysis/),
+but they won't show much details about your Haxe code size.
+
+Haxe Loader includes its own size reporting / visualiser tool to generate a size report as an
+extra `<output>.stats.json`, and an interactive visualisation of this report, as an extra `<output>.stats.html`.
+
+Notes:
+- enable size reporting by adding the `sizeReport` flag in the loader options,
+- `<output>` is picked from the output specified in the HXML file.
+
+Viewer usage: click a group to reveal more details, press Escape or click the Back button to navigate back.
+
+![Stats viewer](https://raw.githubusercontent.com/elsassph/haxe-modular/master/doc/stats.png)
 
 ## Contributing
 

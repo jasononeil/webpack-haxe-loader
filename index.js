@@ -53,7 +53,7 @@ module.exports = function(hxmlContent) {
         }
 
         // Read the resulting JS file and return the main module
-        const processed = processOutput(ns, jsTempFile, jsOutputFile);
+        const processed = processOutput(ns, jsTempFile, jsOutputFile, options);
         if (processed) {
             updateCache(context, ns, processed, classpath);
         }
@@ -65,18 +65,26 @@ function updateCache(context, ns, { contentHash, results }, classpath) {
     cache[ns] = { contentHash, results, classpath };
 }
 
-function processOutput(ns, jsTempFile, jsOutputFile) {
+function processOutput(ns, jsTempFile, jsOutputFile, options) {
     const content = fs.readFileSync(jsTempFile.path);
     // Check whether the output has changed since last build
     const contentHash = hash(content);
     if (cache[ns] && cache[ns].hash === contentHash)
         return null;
-
     // Split output
     const modules = findImports(content);
-    const debug = fs.existsSync(`${jsTempFile.path}.map`);
-    const results = split.run(jsTempFile.path, jsOutputFile, modules, debug, true, false, false, graphHooks)
-        .filter(entry => entry && entry.source);
+    const sourcemaps = fs.existsSync(`${jsTempFile.path}.map`);
+    const sizeReport = !!options.sizeReport;
+    const results = split.run(
+            jsTempFile.path,
+            jsOutputFile,
+            modules,
+            sourcemaps,
+            true  /* commonjs - required */,
+            false /* debug sourcemap - unsupported*/,
+            sizeReport,
+            graphHooks
+        ).filter(entry => entry && entry.source);
 
     // Inject .hx sources in map file
     results.forEach(entry => {
