@@ -2,6 +2,10 @@
 
 ## Next
 
+## 0.8.0
+
+* ✨: Add `sizeReport` option to generate JSON and HTML size reports.
+
 ## 0.7.4
 
 * 🐛 Fix issue with macros needing to be wrapped in quotes.
