@@ -16,7 +16,7 @@ function runSuite() {
 
 function validateTest1(callback) {
     console.log('[Validate] test1');
-    const output = path.resolve(__dirname, 'out/bundle1.js');
+    const output = path.resolve(__dirname, 'dist/bundle1.js');
 
     const src = fs.readFileSync(output).toString();
     const modules = extractModules(src);
@@ -35,12 +35,14 @@ function validateTest1(callback) {
     ]);
 
     runOutput(output, callback);
+
+    assertSizeReportExists('dist/test1.js');
 }
 
 function validateTest2(callback) {
     console.log('[Validate] test2');
-    const output = path.resolve(__dirname, 'out/bundle2.js');
-    const output2 = path.resolve(__dirname, 'out/0.bundle2.js');
+    const output = path.resolve(__dirname, 'dist/bundle2.js');
+    const output2 = path.resolve(__dirname, 'dist/0.bundle2.js');
 
     let src = fs.readFileSync(output).toString();
     let modules = extractModules(src);
@@ -64,6 +66,15 @@ function validateTest2(callback) {
     ]);
 
     runOutput(output, callback);
+
+    assertSizeReportExists('dist/test2.js');
+}
+
+function assertSizeReportExists(filename) {
+    if (!fs.existsSync(path.resolve(__dirname, filename + '.stats.html')))
+        throw `Size report missing: ${filename}.stats.html`;
+    if (!fs.existsSync(path.resolve(__dirname, filename + '.stats.json')))
+        throw `Size report missing: ${filename}.stats.json`;
 }
 
 function runOutput(output, callback) {

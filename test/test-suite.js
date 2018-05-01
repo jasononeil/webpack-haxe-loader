@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const chdir = require('process').chdir;
 const exec = require('child_process').exec;
@@ -43,5 +44,9 @@ function install(callback) {
         callback();
     });
 }
+
+const dist = `${__dirname}/dist/`;
+if (!fs.existsSync(dist))
+    fs.mkdirSync(dist);
 
 install(runSuite);

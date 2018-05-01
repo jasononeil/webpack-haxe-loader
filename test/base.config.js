@@ -4,7 +4,7 @@ module.exports = {
     target: 'node',
     devtool: 'cheap-module-eval-source-map',
     output: {
-        path: `${__dirname}/out/`
+        path: `${__dirname}/dist/`
     },
     resolveLoader: {
         alias: {
@@ -17,7 +17,8 @@ module.exports = {
                 test: /\.hxml$/,
                 loader: 'haxe-loader',
                 options: {
-                    debug: true
+                    debug: true,
+                    sizeReport: true
                 }
             }
         ]

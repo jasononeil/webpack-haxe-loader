@@ -13,7 +13,7 @@ install:
   - node -v && npm install
 
 script:
-  - node test/test-suite.js
+  - npm run test
 
 deploy:
   - provider: script

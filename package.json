@@ -12,6 +12,9 @@
     "index.js",
     "README.md"
   ],
+  "scripts": {
+    "test": "node test/test-suite.js"
+  },
   "dependencies": {
     "hash-sum": "^1.0.2",
     "haxe-modular": "^0.10.9",
