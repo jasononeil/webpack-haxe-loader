@@ -2,6 +2,11 @@
 
 ## Next
 
+## 0.9.0
+
+* ✨ Add `Webpack.createLoader()` in macro context, allowing custom macros to create code splitting points.
+* ✅ Originally main module updates were ignored, now the page is reloaded. (It is still possible to accept updates to the main entrypoint and handle them gracefully if you set it up).
+
 ## 0.8.0
 
 * ✨: Add `sizeReport` option to generate JSON and HTML size reports.
