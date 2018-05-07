@@ -1,5 +1,6 @@
 #if macro
 import haxe.macro.Expr;
+import haxe.macro.ExprTools;
 import haxe.macro.Context;
 using haxe.io.Path;
 using StringTools;
@@ -35,27 +36,13 @@ class Webpack {
 	 * @return A `js.Promise` that will complete when the module is loaded. See README for information on how to use.
 	 */
 	public static macro function load(classRef:Expr) {
-		switch (Context.typeof(classRef)) {
+		var ct = try Context.typeof(classRef) catch (err:Dynamic) {
+			Context.fatalError('Unable to resolve ' + ExprTools.toString(classRef), Context.currentPos());
+		}
+		switch (ct) {
 			case haxe.macro.Type.TType(_.get() => t, _):
 				var module = t.module.split('.').join('_');
-				var query = resolveModule(module);
-				var link = macro untyped $i{module} = $p{["$s", module]};
-				return macro {
-					#if debug
-					if (untyped module.hot) {
-						untyped module.hot.accept($v{query}, function() {
-							untyped require($v{query});
-							$link;
-						});
-					}
-					#end
-					untyped __js__('System.import')($v{query})
-						.then(function(exports) {
-							$link;
-							var _ = untyped $i{module}; // forced reference
-							return exports;
-						});
-				}
+				return createLoader(module);
 			default:
 		}
 		Context.fatalError('A module class reference is required', Context.currentPos());
@@ -84,6 +71,31 @@ class Webpack {
 	}
 
 	#if macro
+	static public function createLoader(module:String) {
+		var query = resolveModule(module);
+		var link = macro untyped $i{module} = $p{["$s", module]};
+		return macro {
+			#if debug
+			if (untyped module.hot) {
+				untyped module.hot.accept($v{query}, function() {
+					#if react_hot
+					untyped require($v{query});
+					$link;
+					#else
+					js.Browser.document.location.reload();
+					#end
+				});
+			}
+			#end
+			untyped __js__('System.import')($v{query})
+				.then(function(exports) {
+					$link;
+					var _ = untyped $i{module}; // forced reference
+					return exports;
+				});
+		}
+	}
+
 	static function resolveModule(name:String) {
 		var ns = Context.definedValue('webpack_namespace');
 		return '!haxe-loader?$ns/$name!';

@@ -5,17 +5,35 @@ class ReactHMR
      * This function should be only called once.
      *
      * Usage:
-     * 
+     *
      *     var rootComponent = ReactDOM.render(...);
-     *     #if debug 
+     *     #if debug
      *     ReactHMR.autoRefresh(rootComponent);
      *     #end
 	 */
-	static public function autoRefresh(component:Dynamic) 
-	{
-        if (untyped module.hot) {
+	static public function autoRefresh(component:Dynamic, autoReloadMain:Bool = true) {
+		var hot:{
+			data: Dynamic,
+			status: (String->Void)->Void,
+			accept: Void->Void,
+			dispose: (Dynamic->Void)->Void
+		} = untyped module.hot;
+
+        if (hot != null) {
+			// if main module has changed, reload the page
+			if (autoReloadMain) {
+				if (hot.data != null && hot.data.forceReload) {
+					js.Browser.document.location.reload();
+					return;
+				}
+				hot.dispose(function (data) {
+					data.forceReload = true;
+				});
+			}
+			hot.accept();
+			// if a sub-module has changed, force deep React re-render
             var dirty = false;
-            untyped module.hot.status(function(status) {
+            hot.status(function(status) {
                 if (status == 'apply') dirty = true;
                 else if (status == 'idle' && dirty) {
                     dirty = false;
