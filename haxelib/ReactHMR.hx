@@ -1,5 +1,11 @@
-class ReactHMR
-{
+typedef ModuleHMR = {
+	data: Dynamic,
+	status: (String->Void)->Void,
+	accept: ?Dynamic->Void,
+	dispose: (Dynamic->Void)->Void
+}
+
+class ReactHMR {
 	/**
 	 * Deep refresh the provided React component when a module is reloaded.
      * This function should be only called once.
@@ -12,12 +18,7 @@ class ReactHMR
      *     #end
 	 */
 	static public function autoRefresh(component:Dynamic, autoReloadMain:Bool = true) {
-		var hot:{
-			data: Dynamic,
-			status: (String->Void)->Void,
-			accept: Void->Void,
-			dispose: (Dynamic->Void)->Void
-		} = untyped module.hot;
+		var hot:ModuleHMR = untyped module.hot;
 
         if (hot != null) {
 			// if main module has changed, reload the page
