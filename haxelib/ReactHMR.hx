@@ -12,27 +12,23 @@ class ReactHMR {
 	 *
 	 * Usage:
 	 *
-	 *     var rootComponent = ReactDOM.render(...);
-	 *     #if debug
-	 *     ReactHMR.autoRefresh(rootComponent);
-	 *     #end
+	 *	 var rootComponent = ReactDOM.render(...);
+	 *	 #if debug
+	 *	 ReactHMR.autoRefresh(rootComponent);
+	 *	 #end
 	 */
 	static public function autoRefresh(component:Dynamic, autoReloadMain:Bool = true) {
 		var hot:ModuleHMR = untyped module.hot;
-
 		if (hot != null) {
-			// if main module has changed, reload the page
+			// allow main module to be updated
+			hot.accept();
 			if (autoReloadMain) {
-				if (hot.data != null && hot.data.forceReload) {
-					js.Browser.document.location.reload();
-					return;
-				}
+				// BUT if main module has changed, reload the page
 				hot.dispose(function (data) {
-					data.forceReload = true;
+					js.Browser.document.location.reload();
 				});
 			}
-			hot.accept();
-			// if a sub-module has changed, force deep React re-render
+			// if a module has changed, force deep React re-render
 			var dirty = false;
 			hot.status(function(status) {
 				if (status == 'apply') dirty = true;
