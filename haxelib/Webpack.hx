@@ -30,7 +30,7 @@ class Webpack {
 	/**
 	 * Load a Haxe class asynchronously, using haxe-modular code splitting to separate it from the main bundle.
 	 *
-	 * This will use `System.import()` to have webpack load it asynchronously.
+	 * This will use `import()` to have webpack load it asynchronously.
 	 *
 	 * @param classRef The Haxe class or type you wish to load asynchronously
 	 * @return A `js.Promise` that will complete when the module is loaded. See README for information on how to use.
@@ -63,7 +63,7 @@ class Webpack {
 		switch (name.expr) {
 			case EConst(CString(module)):
 				var query = resolveModule(module);
-				return macro untyped __js__('System.import')($v{query});
+				return macro untyped __js__('import')($v{query});
 			default:
 		}
 		Context.fatalError('A String literal is required', Context.currentPos());
@@ -87,7 +87,7 @@ class Webpack {
 				});
 			}
 			#end
-			untyped __js__('System.import')($v{query})
+			untyped __js__('import')($v{query})
 				.then(function(exports) {
 					$link;
 					var _ = untyped $i{module}; // forced reference

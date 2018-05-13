@@ -1,8 +1,9 @@
 /**
  * In `src`, match all the cases in `tests`, or throw an error
  */
-function assertInModule(index, src, title, tests) {
-    if (!src) throw `FAILED: ${title} does not have a module ${index}`;
+function assertInModule(name, modules, title, tests) {
+    const src = modules[name];
+    if (!src) throw `FAILED: ${title} does not have a module ${name}`;
     tests.forEach(test => {
         if (src.indexOf(test) < 0) {
             throw `FAILED: ${title} should contain "${test}"\n\n[...]${src}`;
@@ -14,32 +15,27 @@ function assertInModule(index, src, title, tests) {
  * Extract/butcher individual module source from webpack-generated JS
  */
 function extractModules(src) {
-    const reModule = /\/\* ([0-9]+) \*\/\n\/\*\*\*\/ \(function/;
+    const reModule = /\n\/\*\*\*\/ "([^"]+)":/;
     return splitSrc(src, reModule);
-}
-
-/**
- * Extract/butcher individual module source from webpack-generated chunk JS
- */
-function extractChunks(src) {
-    const reChunk = /\/\*\*\*\/ ([0-9]+):\n\/\*\*\*\/ \(function/;
-    return splitSrc(src, reChunk);
 }
 
 function splitSrc(src, re) {
     let m, last;
-    const result = [];
-    while (m = re.exec(src)) {
-        if (last) result[+last[1]] = src.substr(0, m.index);
-        last = m;
+    const result = {};
+    while ((m = re.exec(src))) {
+        if (last) result[last] = trimSrc(src.substr(0, m.index));
+        last = m[1];
         src = src.substr(m.index + m[0].length);
     }
-    if (last) result[+last[1]] = src;
+    if (last) result[last] = trimSrc(src);
     return result;
+}
+
+function trimSrc(src) {
+    return src.substr(0, src.lastIndexOf('/***/ })') + 8);
 }
 
 module.exports = {
     assertInModule,
-    extractModules,
-    extractChunks
+    extractModules
 };

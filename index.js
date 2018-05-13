@@ -1,4 +1,4 @@
-"use_strict";
+'use_strict';
 
 const loaderUtils = require('loader-utils');
 const fs = require('fs');
@@ -29,7 +29,13 @@ module.exports = function(hxmlContent) {
 
     const ns = path.basename(request).replace('.hxml', '');
     const jsTempFile = makeJSTempFile(ns);
-    const { jsOutputFile, classpath, args } = prepare(options, context, ns, hxmlContent, jsTempFile);
+    const { jsOutputFile, classpath, args } = prepare(
+        options,
+        context,
+        ns,
+        hxmlContent,
+        jsTempFile
+    );
 
     registerDepencencies(context, classpath);
 
@@ -47,7 +53,7 @@ module.exports = function(hxmlContent) {
             var delay = options.delayForNonJsBuilds || 0;
             setTimeout(() => {
                 // We will include a random string in the output so that the dev server notices a difference and triggers a page refresh.
-                cb(null, "// " + Math.random())
+                cb(null, '// ' + Math.random());
             }, delay);
             return;
         }
@@ -69,36 +75,35 @@ function processOutput(ns, jsTempFile, jsOutputFile, options) {
     const content = fs.readFileSync(jsTempFile.path);
     // Check whether the output has changed since last build
     const contentHash = hash(content);
-    if (cache[ns] && cache[ns].hash === contentHash)
-        return null;
+    if (cache[ns] && cache[ns].hash === contentHash) return null;
     // Split output
     const modules = findImports(content);
     const sourcemaps = fs.existsSync(`${jsTempFile.path}.map`);
     const sizeReport = !!options.sizeReport;
-    const results = split.run(
+    const results = split
+        .run(
             jsTempFile.path,
             jsOutputFile,
             modules,
             sourcemaps,
-            true  /* commonjs - required */,
+            true /* commonjs - required */,
             false /* debug sourcemap - unsupported*/,
             sizeReport,
             graphHooks
-        ).filter(entry => entry && entry.source);
+        )
+        .filter(entry => entry && entry.source);
 
     // Inject .hx sources in map file
     results.forEach(entry => {
         if (entry.map) {
             const map = entry.map.content;
-            map.sourcesContent = map.sources
-                .map(path => getSystemPath(path))
-                .map(path => {
-                    try {
-                        return fs.readFileSync(path).toString();
-                    } catch (_) {
-                        return `/*\n Source not found:\n ${path}\n*/`;
-                    }
-                });
+            map.sourcesContent = map.sources.map(path => getSystemPath(path)).map(path => {
+                try {
+                    return fs.readFileSync(path).toString();
+                } catch (_) {
+                    return `/*\n Source not found:\n ${path}\n*/`;
+                }
+            });
         }
     });
 
@@ -157,8 +162,8 @@ function fromCache(context, query, cb) {
 }
 
 function findImports(content) {
-    // Webpack.load() emits a call to System.import with a query to haxe-loader
-    const reImports = /System.import\("!haxe-loader\?([^!]+)/g;
+    // Webpack.load() emits a call to import() with a query to haxe-loader
+    const reImports = /import\("!haxe-loader\?([^!]+)/g;
     const results = [];
 
     let match = reImports.exec(content);
@@ -211,7 +216,9 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         args.push(name);
 
         if (name === '--next') {
-            var err = `${context.resourcePath} included a "--next" line, hxml-loader only supports a single build per hxml file.`;
+            var err = `${
+                context.resourcePath
+            } included a "--next" line, hxml-loader only supports a single build per hxml file.`;
             throw new Error(err);
         }
 
@@ -232,13 +239,15 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
                 preventJsOutput = true;
                 if (jsOutputFile) {
                     // If a JS output file was already set to use a webpack temp file, go back and undo that.
-                    args = args.map(arg => (arg === jsTempFile.path) ? value : arg);
+                    args = args.map(arg => (arg === jsTempFile.path ? value : arg));
                     jsOutputFile = null;
                 }
             }
 
             if (name === '-lib' && /^modular(:|$)/.test(value)) {
-                throw new Error('When using haxe-loader, you need to remove `-lib modular` from your hxml file');
+                throw new Error(
+                    'When using haxe-loader, you need to remove `-lib modular` from your hxml file'
+                );
             }
 
             if (name == '--macro') {
