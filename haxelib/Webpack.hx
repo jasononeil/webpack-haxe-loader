@@ -63,7 +63,8 @@ class Webpack {
 		switch (name.expr) {
 			case EConst(CString(module)):
 				var query = resolveModule(module);
-				return macro untyped __js__('import')($v{query});
+				var dynamicImport = createImport(module, query);
+				return macro untyped __js__($v{dynamicImport});
 			default:
 		}
 		Context.fatalError('A String literal is required', Context.currentPos());
@@ -73,6 +74,7 @@ class Webpack {
 	#if macro
 	static public function createLoader(module:String) {
 		var query = resolveModule(module);
+		var dynamicImport = createImport(module, query);
 		var link = macro untyped $i{module} = $p{["$s", module]};
 		return macro {
 			#if debug
@@ -87,13 +89,21 @@ class Webpack {
 				});
 			}
 			#end
-			untyped __js__('import')($v{query})
+			untyped __js__($v{dynamicImport})
 				.then(function(exports) {
 					$link;
 					var _ = untyped $i{module}; // forced reference
 					return exports;
 				});
 		}
+	}
+
+	static public function createImport(module:String, query:String) {
+		#if webpack_namedchunks
+		return 'import(/* webpackChunkName: "$module" */ "$query")';
+		#else
+		return 'import("$query")';
+		#end
 	}
 
 	static function resolveModule(name:String) {

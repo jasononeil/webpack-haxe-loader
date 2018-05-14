@@ -162,14 +162,17 @@ function fromCache(context, query, cb) {
 }
 
 function findImports(content) {
-    // Webpack.load() emits a call to import() with a query to haxe-loader
-    const reImports = /import\("!haxe-loader\?([^!]+)/g;
+    // Webpack.load() emits a call to import() with a query to haxe-loader,
+    // optionally with a chunk name (-D webpack_namedchunks):
+    // - import("!haxe-loader?hxmlName/moduleName")
+    // - import(/* webpackChunkName: "moduleName" */ "!haxe-loader?hxmlName/moduleName")
+    const reImports = /import\((\/\*[^*]+\*\/ )?"!haxe-loader\?([^!]+)/g;
     const results = [];
 
     let match = reImports.exec(content);
     while (match) {
         // Module reference  is of the form 'hxmlName/moduleName'
-        const name = match[1].substr(match[1].indexOf('/') + 1);
+        const name = match[2].substr(match[2].indexOf('/') + 1);
         results.push(name);
         match = reImports.exec(content);
     }
