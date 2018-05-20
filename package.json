@@ -10,6 +10,7 @@
   },
   "files": [
     "index.js",
+    "haxelib",
     "README.md"
   ],
   "scripts": {
