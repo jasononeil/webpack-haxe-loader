@@ -227,9 +227,9 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
             );
         }
 
-        if (name === '-cmd') {
+        if (name === '-cmd' || name === '--cwd') {
             throw new Error(
-                `${context.resourcePath} (or \`options.extra\`) included a "-cmd" line, `
+                `${context.resourcePath} (or \`options.extra\`) included a "${name}" line, `
                 + `which is not allowed by haxe-loader.`
             );
         }
@@ -276,7 +276,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         }
 
         // Quote arguments that may need it
-        if (name === '--macro' || name === '-resource' || name === "--cwd") {
+        if (name === '--macro' || name === '-resource') {
             const value = hxmlOptions[++i];
             args.push(name, `"${value}"`);
             continue;
