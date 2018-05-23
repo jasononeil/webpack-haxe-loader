@@ -163,7 +163,7 @@ function fromCache(context, query, cb) {
 
 function findImports(content) {
     // Webpack.load() emits a call to import() with a query to haxe-loader,
-    // optionally with a chunk name (-D webpack_namedchunks):
+    // with a chunk name (unless -D webpack_nonamedchunks):
     // - import("!haxe-loader?hxmlName/moduleName")
     // - import(/* webpackChunkName: "moduleName" */ "!haxe-loader?hxmlName/moduleName")
     const reImports = /import\((\/\*[^*]+\*\/ )?"!haxe-loader\?([^!]+)/g;
