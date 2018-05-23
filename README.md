@@ -143,10 +143,10 @@ and Webpack will emit separate bundles with these files and their required depen
 
 ### Named bundles
 
-By default split bundles are named `0.js`, `1.js`...
+Split bundles used to be named `0.js`, `1.js`... Haxe loader now defaults to naming the bundles
+according to the module name (e.g. `com_Foo.js`).
 
-To give them a more explicit name, you can add `-D webpack_namedchunks`; split bundles will then
-be named from the module name (e.g. `com_Foo.js`).
+To revert to the original naming behaviour, you can add `-D webpack_nonamedchunks`.
 
 
 ## DevTools / source maps

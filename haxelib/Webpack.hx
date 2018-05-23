@@ -99,10 +99,10 @@ class Webpack {
 	}
 
 	static public function createImport(module:String, query:String) {
-		#if webpack_namedchunks
-		return 'import(/* webpackChunkName: "$module" */ "$query")';
-		#else
+		#if webpack_nonamedchunks
 		return 'import("$query")';
+		#else
+		return 'import(/* webpackChunkName: "$module" */ "$query")';
 		#end
 	}
 
