@@ -2,3 +2,4 @@
 -cp src
 -js dist/test2.js
 -main Test2.hx
+-D webpack_nonamedchunks

@@ -1,9 +1,11 @@
-const merge = require ('webpack-merge');
+const merge = require('webpack-merge');
 const baseConfig = require('./base.config');
 
 module.exports = merge(baseConfig, {
+    mode: 'development',
+    devtool: 'source-map',
     entry: './test2.hxml',
     output: {
         filename: 'bundle2.js'
-    },
+    }
 });

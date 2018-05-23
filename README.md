@@ -141,6 +141,13 @@ and Webpack will emit separate bundles with these files and their required depen
 - An advanced API to control Haxe code splitting is available - see:
 [controlled splitting API](https://github.com/elsassph/haxe-modular/blob/master/doc/advanced.md#controlled-bundling).
 
+### Named bundles
+
+Split bundles used to be named `0.js`, `1.js`... Haxe loader now defaults to naming the bundles
+according to the module name (e.g. `com_Foo.js`).
+
+To revert to the original naming behaviour, you can add `-D webpack_nonamedchunks`.
+
 
 ## DevTools / source maps
 

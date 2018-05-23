@@ -46,7 +46,6 @@ function install(callback) {
 }
 
 const dist = `${__dirname}/dist/`;
-if (!fs.existsSync(dist))
-    fs.mkdirSync(dist);
+if (!fs.existsSync(dist)) fs.mkdirSync(dist);
 
 install(runSuite);
