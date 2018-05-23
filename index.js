@@ -202,7 +202,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
     let mainClass = 'Main';
     let preventJsOutput = false;
 
-    // Add args that are specific to hxml-loader
+    // Add args that are specific to haxe-loader
     if (options.debug) {
         args.push('-debug');
     }
@@ -223,14 +223,14 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         if (name === '--next') {
             throw new Error(
                 `${context.resourcePath} (or \`options.extra\`) included a "--next" line, `
-                + `hxml-loader only supports a single build per hxml file.`
+                + `haxe-loader only supports a single build per hxml file.`
             );
         }
 
         if (name === '-cmd') {
             throw new Error(
                 `${context.resourcePath} (or \`options.extra\`) included a "-cmd" line, `
-                + `which is not allowed by hxml-loader.`
+                + `which is not allowed by haxe-loader.`
             );
         }
 
