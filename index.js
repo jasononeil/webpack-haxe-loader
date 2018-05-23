@@ -8,6 +8,7 @@ const tmp = require('tmp');
 const hash = require('hash-sum');
 const split = require('haxe-modular/tool/bin/split');
 const hooks = require('haxe-modular/bin/hooks');
+const tokenize = require('yargs-parser/lib/tokenize-arg-string');
 
 const cache = Object.create(null);
 // resolve hooks once
@@ -201,44 +202,54 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
     let mainClass = 'Main';
     let preventJsOutput = false;
 
-    // Add args that are specific to hxml-loader
+    // Add args that are specific to haxe-loader
     if (options.debug) {
         args.push('-debug');
     }
     args.push('-D', `webpack_namespace=${ns}`);
 
+    // Merge hxml and options.extra
+    let flatHxml = hxmlContent.split('\n').filter(l => !l.startsWith('#')).join(' ');
+    if (options.extra) flatHxml += ' ' + options.extra;
+
+    // Parse arguments for Haxe
+    const hxmlOptions = tokenize(flatHxml);
+    const len = hxmlOptions.length;
+
     // Process all of the args in the hxml file.
-    for (let line of hxmlContent.split('\n')) {
-        line = line.trim();
-        if (line === '' || line.substr(0, 1) === '#') {
+    for (let i = 0; i < len; i++) {
+        const name = hxmlOptions[i];
+
+        if (name === '--next') {
+            throw new Error(
+                `${context.resourcePath} (or \`options.extra\`) included a "--next" line, `
+                + `haxe-loader only supports a single build per hxml file.`
+            );
+        }
+
+        if (name === '-cmd' || name === '--cwd') {
+            throw new Error(
+                `${context.resourcePath} (or \`options.extra\`) included a "${name}" line, `
+                + `which is not allowed by haxe-loader.`
+            );
+        }
+
+        if (name === '-js' && !preventJsOutput) {
+            jsOutputFile = hxmlOptions[++i];
+            args.push(name, jsTempFile.path);
             continue;
         }
 
-        let space = line.indexOf(' ');
-        let name = space > -1 ? line.substr(0, space) : line;
-        args.push(name);
-
-        if (name === '--next') {
-            var err = `${
-                context.resourcePath
-            } included a "--next" line, hxml-loader only supports a single build per hxml file.`;
-            throw new Error(err);
+        if (name === '-cp') {
+            i++;
+            classpath.push(path.resolve(hxmlOptions[i]));
+            args.push(name, `"${path.resolve(hxmlOptions[i])}"`);
+            continue;
         }
 
-        if (space > -1) {
-            let value = line.substr(space + 1).trim();
-
-            if (name === '-js' && !preventJsOutput) {
-                jsOutputFile = value;
-                args.push(jsTempFile.path);
-                continue;
-            }
-
-            if (name === '-cp') {
-                classpath.push(path.resolve(value));
-            }
-
-            if (name === '-D' && value == 'prevent-webpack-js-output') {
+        if (name === '-D') {
+            const value = hxmlOptions[++i];
+            if (value === 'prevent-webpack-js-output') {
                 preventJsOutput = true;
                 if (jsOutputFile) {
                     // If a JS output file was already set to use a webpack temp file, go back and undo that.
@@ -247,23 +258,33 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
                 }
             }
 
-            if (name === '-lib' && /^modular(:|$)/.test(value)) {
+            args.push(name, `"${value}"`);
+            continue;
+        }
+
+        if (name === '-lib') {
+            const value = hxmlOptions[++i];
+
+            if (/^modular(:|$)/.test(value)) {
                 throw new Error(
                     'When using haxe-loader, you need to remove `-lib modular` from your hxml file'
                 );
             }
 
-            if (name == '--macro') {
-                // quote macro value
-                args.push(`"${value}"`);
-                continue;
-            }
-
-            args.push(value);
+            args.push(name, value);
+            continue;
         }
-    }
 
-    if (options.extra) args.push(options.extra);
+        // Quote arguments that may need it
+        if (name === '--macro' || name === '-resource') {
+            const value = hxmlOptions[++i];
+            args.push(name, `"${value}"`);
+            continue;
+        }
+
+        // Add all other arguments as-is
+        args.push(name);
+    }
 
     return { jsOutputFile, classpath, args };
 }
