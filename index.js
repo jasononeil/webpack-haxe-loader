@@ -221,10 +221,17 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         const name = hxmlOptions[i];
 
         if (name === '--next') {
-            var err = `${
-                context.resourcePath
-            } included a "--next" line, hxml-loader only supports a single build per hxml file.`;
-            throw new Error(err);
+            throw new Error(
+                `${context.resourcePath} (or \`options.extra\`) included a "--next" line, `
+                + `hxml-loader only supports a single build per hxml file.`
+            );
+        }
+
+        if (name === '-cmd') {
+            throw new Error(
+                `${context.resourcePath} (or \`options.extra\`) included a "-cmd" line, `
+                + `which is not allowed by hxml-loader.`
+            );
         }
 
         if (name === '-js' && !preventJsOutput) {
@@ -269,7 +276,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         }
 
         // Quote arguments that may need it
-        if (name === '--macro' || name === '-resource' || name === "--cwd" || name === "-cmd") {
+        if (name === '--macro' || name === '-resource' || name === "--cwd") {
             const value = hxmlOptions[++i];
             args.push(name, `"${value}"`);
             continue;
