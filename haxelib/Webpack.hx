@@ -146,10 +146,12 @@ class Webpack {
 
 	static function relativePath(directory:String) {
 		// make base path relative
-		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
+		if (directory.length > 2
+			&& (directory.charAt(0) == '/' || directory.charAt(1) == ':')
+		) {
 			var cwd = Sys.getCwd().replace('\\', '/');
-			if (directory.startsWith(cwd))
-				return directory.substr(cwd.length);
+			directory = directory.replace('\\', '/');
+			if (directory.startsWith(cwd)) return directory.substr(cwd.length);
 		}
 		return directory;
 	}

@@ -36,6 +36,7 @@ class WebpackTestCase extends TestCase {
     function test_relativePath() {
         assert(relativePath('src/a.hx') == 'src/a.hx');
         assert(relativePath('/temp/src/a.hx') == '/temp/src/a.hx');
+        assert(relativePath('C:\\temp\\src\\a.hx') == 'C:/temp/src/a.hx');
         assert(relativePath_madeAbsolute('src/a.hx') == 'src/a.hx');
     }
 
@@ -62,7 +63,7 @@ class WebpackTestCase extends TestCase {
 
 	@:access(Webpack.relativePath)
     macro static function relativePath_madeAbsolute(frag:String) {
-        var file = Sys.getCwd().replace('\\', '/') + frag;
+        var file = Sys.getCwd() + frag;
         return macro $v{Webpack.relativePath(file)};
     }
 
