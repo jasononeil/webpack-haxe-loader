@@ -12,14 +12,20 @@ class Webpack {
 	 */
 	public static macro function require(file:String):ExprOf<Dynamic> {
 		if (Context.defined('js')) {
+			// extract inline loaders
+			var loaders = '';
+			var bang = file.lastIndexOf('!');
+			if (bang > 0) {
+				loaders = file.substr(0, bang + 1);
+				file = file.substr(bang + 1);
+			}
 			// Adjust relative path
-			// TODO: handle inline loader syntax
 			if (file.startsWith('.')) {
 				var posInfos = Context.getPosInfos(Context.currentPos());
-				var directory = posInfos.file.directory();
+				var directory = relativePath(posInfos.file.directory());
 				file = rebaseRelativePath(directory, file);
 			}
-			return macro js.Lib.require($v{file});
+			return macro js.Lib.require($v{loaders + file});
 		} else {
 			// TODO: find a way to track "required" files on non-JS builds.
 			// Perhaps by tracking in metadata and saving to the JSON outputFile, and processng inside the loader.
@@ -112,13 +118,6 @@ class Webpack {
 	}
 
 	static function rebaseRelativePath(directory:String, file:String) {
-		// make base path relative
-		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
-			var cwd = Sys.getCwd().replace('\\', '/');
-			if (directory.startsWith(cwd))
-				directory = './${directory.substr(cwd.length)}';
-		}
-
 		if (file.startsWith('./')) {
 			file = file.substr(2);
 			return './${directory}/${file}';
@@ -143,6 +142,16 @@ class Webpack {
 			return file;
 		}
 		return './${file}';
+	}
+
+	static function relativePath(directory:String) {
+		// make base path relative
+		if (~/^(\/)|([A-Z]:)/i.match(directory)) {
+			var cwd = Sys.getCwd().replace('\\', '/');
+			if (directory.startsWith(cwd))
+				return directory.substr(cwd.length);
+		}
+		return directory;
 	}
 	#end
 }
