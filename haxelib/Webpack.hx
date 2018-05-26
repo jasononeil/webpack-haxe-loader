@@ -120,11 +120,11 @@ class Webpack {
 	static function rebaseRelativePath(directory:String, file:String) {
 		if (file.startsWith('./')) {
 			file = file.substr(2);
-			return './${directory}/${file}';
+			return '${directory}/${file}';
 		}
 
 		while (file.startsWith('../')) {
-			if (directory.indexOf('/') > 0) {
+			if (directory.lastIndexOf('/') > 0) {
 				file = file.substr(3);
 				directory = directory.directory();
 			} else if (directory != '') {
@@ -135,7 +135,7 @@ class Webpack {
 		}
 
 		if (directory != '') {
-			return './${directory}/${file}';
+			return '${directory}/${file}';
 		}
 		if (file.startsWith('.')) {
 			// file goes further up the project root
@@ -151,9 +151,10 @@ class Webpack {
 		) {
 			var cwd = Sys.getCwd().replace('\\', '/');
 			directory = directory.replace('\\', '/');
-			if (directory.startsWith(cwd)) return directory.substr(cwd.length);
+			if (directory.startsWith(cwd)) return './${directory.substr(cwd.length)}';
+			return directory;
 		}
-		return directory;
+		return './$directory';
 	}
 	#end
 }

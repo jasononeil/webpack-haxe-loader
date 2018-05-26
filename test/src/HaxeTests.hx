@@ -21,23 +21,23 @@ class WebpackTestCase extends TestCase {
     }
 
     function test_rebaseRelativePath() {
-        assert(rebaseRelativePath('src', './res') == './src/res');
-        assert(rebaseRelativePath('src/a', './res') == './src/a/res');
-        assert(rebaseRelativePath('src/a/b', './res') == './src/a/b/res');
-        assert(rebaseRelativePath('src/a/b', '../res') == './src/a/res');
-        assert(rebaseRelativePath('src/a/b', '../../res') == './src/res');
+        assert(rebaseRelativePath('src', './res') == 'src/res');
+        assert(rebaseRelativePath('src/a', './res') == 'src/a/res');
+        assert(rebaseRelativePath('src/a/b', './res') == 'src/a/b/res');
+        assert(rebaseRelativePath('src/a/b', '../res') == 'src/a/res');
+        assert(rebaseRelativePath('src/a/b', '../../res') == 'src/res');
         assert(rebaseRelativePath('src/a/b', '../../../res') == './res');
-        assert(rebaseRelativePath('src', './c/res') == './src/c/res');
+        assert(rebaseRelativePath('src', './c/res') == 'src/c/res');
         assert(rebaseRelativePath('src', '../res') == './res');
         assert(rebaseRelativePath('src', '../../res') == '../res');
         assert(rebaseRelativePath('src', '../../../res') == '../../res');
     }
 
     function test_relativePath() {
-        assert(relativePath('src/a.hx') == 'src/a.hx');
+        assert(relativePath('src/a.hx') == './src/a.hx');
         assert(relativePath('/temp/src/a.hx') == '/temp/src/a.hx');
         assert(relativePath('C:\\temp\\src\\a.hx') == 'C:/temp/src/a.hx');
-        assert(relativePath_madeAbsolute('src/a.hx') == 'src/a.hx');
+        assert(relativePath_madeAbsolute('src/a.hx') == './src/a.hx');
     }
 
     // macro functions wrappers
