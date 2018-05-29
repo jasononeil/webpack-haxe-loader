@@ -1,5 +1,5 @@
 -cp ../haxelib
 -cp src
 -js dist/test2.js
--main Test2.hx
+-main Test2
 -D webpack_nonamedchunks

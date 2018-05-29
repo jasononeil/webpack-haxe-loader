@@ -14,12 +14,15 @@
     "README.md"
   ],
   "scripts": {
-    "test": "node test/test-suite.js"
+    "test": "npm run test:haxe && npm run test:js",
+    "test:js": "node test/test-suite.js",
+    "test:haxe": "haxe test/test-haxe.hxml && node test/dist/testHaxe.js"
   },
   "dependencies": {
     "hash-sum": "^1.0.2",
     "haxe-modular": "^0.10.10",
     "loader-utils": "^1.1.0",
+    "null-loader": "^0.1.1",
     "tmp": "0.0.33"
   }
 }
