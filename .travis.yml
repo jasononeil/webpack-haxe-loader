@@ -9,8 +9,16 @@ matrix:
   allow_failures:
     - haxe: development
 
+# npm update to be able to optimize installations with `npm ci` and npm cache
 install:
-  - node -v && npm install
+  - node -v
+  - npm i -g npm@5.7.1
+  - npm ci
+
+# Keep the npm cache around to speed up installs
+cache:
+  directories:
+  - "$HOME/.npm"
 
 script:
   - npm run test
