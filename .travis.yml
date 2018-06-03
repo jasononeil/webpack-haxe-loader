@@ -14,6 +14,7 @@ install:
   - node -v
   - npm i -g npm@5.7.1
   - npm ci
+  - haxelib install hx3compat
 
 # Keep the npm cache around to speed up installs
 cache:
