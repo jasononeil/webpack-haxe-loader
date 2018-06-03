@@ -22,8 +22,7 @@ class Webpack {
 			// Adjust relative path
 			if (file.startsWith('.')) {
 				var posInfos = Context.getPosInfos(Context.currentPos());
-				var directory = relativePath(posInfos.file.directory());
-				file = rebaseRelativePath(directory, file);
+				file = rebaseRelativePath(posInfos.file.directory(), file);
 			}
 			return macro js.Lib.require($v{loaders + file});
 		} else {
@@ -118,43 +117,28 @@ class Webpack {
 	}
 
 	static function rebaseRelativePath(directory:String, file:String) {
-		if (file.startsWith('./')) {
-			file = file.substr(2);
-			return '${directory}/${file}';
-		}
-
-		while (file.startsWith('../')) {
-			if (directory.lastIndexOf('/') > 0) {
-				file = file.substr(3);
-				directory = directory.directory();
-			} else if (directory != '') {
-				file = file.substr(3);
-				directory = '';
-				break;
-			}
-		}
-
-		if (directory != '') {
-			return '${directory}/${file}';
-		}
-		if (file.startsWith('.')) {
-			// file goes further up the project root
-			return file;
-		}
-		return './${file}';
+		directory = makeRelativeToCwd(directory);
+		directory = '${directory}/${file}'.normalize();
+		if (directory.isAbsolute() || directory.startsWith('../')) return directory;
+		return './$directory';
 	}
 
-	static function relativePath(directory:String) {
-		// make base path relative
-		if (directory.length > 2
-			&& (directory.charAt(0) == '/' || directory.charAt(1) == ':')
-		) {
+	static function makeRelativeToCwd(directory:String) {
+		directory = directory.removeTrailingSlashes();
+		var len = directory.length;
+
+		if (directory.isAbsolute()) {
 			var cwd = Sys.getCwd().replace('\\', '/');
 			directory = directory.replace('\\', '/');
 			if (directory.startsWith(cwd)) return './${directory.substr(cwd.length)}';
 			return directory;
 		}
+
+		if (directory.startsWith('./') || directory.startsWith('../'))
+			return directory;
+
 		return './$directory';
 	}
 	#end
 }
+
