@@ -23,6 +23,7 @@
     "haxe-modular": "^0.10.13",
     "loader-utils": "^1.1.0",
     "null-loader": "^0.1.1",
-    "tmp": "0.0.33"
+    "tmp": "0.0.33",
+    "yargs-parser": "^10.0.0"
   }
 }
