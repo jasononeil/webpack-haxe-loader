@@ -227,27 +227,27 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
             );
         }
 
-        if (name === '-cmd' || name === '--cwd') {
+        if (name === '-cmd' || name === '--cmd' || name === '-C' || name === '--cwd') {
             throw new Error(
                 `${context.resourcePath} (or \`options.extra\`) included a "${name}" line, `
                 + `which is not allowed by haxe-loader.`
             );
         }
 
-        if (name === '-js' && !preventJsOutput) {
+        if ((name === '-js' || name === '--js') && !preventJsOutput) {
             jsOutputFile = hxmlOptions[++i];
             args.push(name, jsTempFile.path);
             continue;
         }
 
-        if (name === '-cp') {
+        if (name === '-cp' || name === '-p' || name === '--class-path') {
             i++;
             classpath.push(path.resolve(hxmlOptions[i]));
             args.push(name, `"${path.resolve(hxmlOptions[i])}"`);
             continue;
         }
 
-        if (name === '-D') {
+        if (name === '-D' || name === '--define') {
             const value = hxmlOptions[++i];
             if (value === 'prevent-webpack-js-output') {
                 preventJsOutput = true;
@@ -262,7 +262,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
             continue;
         }
 
-        if (name === '-lib') {
+        if (name === '-lib' || name === '-L' || name === '--library') {
             const value = hxmlOptions[++i];
 
             if (/^modular(:|$)/.test(value)) {
@@ -276,7 +276,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         }
 
         // Quote arguments that may need it
-        if (name === '--macro' || name === '-resource') {
+        if (name === '--macro' || name === '-resource' || name === '--resource' || name === '-r') {
             const value = hxmlOptions[++i];
             args.push(name, `"${value}"`);
             continue;
