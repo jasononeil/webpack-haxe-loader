@@ -38,33 +38,36 @@ module.exports = function(hxmlContent) {
         jsTempFile
     );
 
-    registerDepencencies(context, classpath);
+    getClasspath(args, classpath)
+    .then(classpath => {
+        registerDepencencies(context, classpath);
 
-    // Execute the Haxe build.
-    console.log('haxe', args.join(' '));
-    exec(`haxe ${args.join(' ')}`, (err, stdout, stderr) => {
-        if (err) {
-            return cb(err);
-        }
+        // Execute the Haxe build.
+        console.log('haxe', args.join(' '));
+        exec(`haxe ${args.join(' ')}`, (err, stdout, stderr) => {
+            if (err) {
+                return cb(err);
+            }
 
-        // If the hxml file outputs something other than client JS, we should not include it in the bundle.
-        // We're only passing it through webpack so that we get `watch` and the like to work.
-        if (!jsOutputFile) {
-            // We allow the user to configure a timeout so the server has a chance to restart before webpack triggers a page refresh.
-            var delay = options.delayForNonJsBuilds || 0;
-            setTimeout(() => {
-                // We will include a random string in the output so that the dev server notices a difference and triggers a page refresh.
-                cb(null, '// ' + Math.random());
-            }, delay);
-            return;
-        }
+            // If the hxml file outputs something other than client JS, we should not include it in the bundle.
+            // We're only passing it through webpack so that we get `watch` and the like to work.
+            if (!jsOutputFile) {
+                // We allow the user to configure a timeout so the server has a chance to restart before webpack triggers a page refresh.
+                var delay = options.delayForNonJsBuilds || 0;
+                setTimeout(() => {
+                    // We will include a random string in the output so that the dev server notices a difference and triggers a page refresh.
+                    cb(null, '// ' + Math.random());
+                }, delay);
+                return;
+            }
 
-        // Read the resulting JS file and return the main module
-        const processed = processOutput(ns, jsTempFile, jsOutputFile, options);
-        if (processed) {
-            updateCache(context, ns, processed, classpath);
-        }
-        returnModule(context, ns, null /* entry point */, cb);
+            // Read the resulting JS file and return the main module
+            const processed = processOutput(ns, jsTempFile, jsOutputFile, options);
+            if (processed) {
+                updateCache(context, ns, processed, classpath);
+            }
+            returnModule(context, ns, null /* entry point */, cb);
+        });
     });
 };
 
@@ -123,7 +126,7 @@ function getSystemPath(path) {
 }
 
 function returnModule(context, ns, name, cb) {
-    const { results, classpath } = cache[ns];
+    const { results } = cache[ns];
     if (!results.length) {
         throw new Error(`${ns}.hxml did not emit any modules`);
     }
@@ -287,4 +290,18 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
     }
 
     return { jsOutputFile, classpath, args };
+}
+
+function getClasspath(args, fallback) {
+    return new Promise((resolve) => {
+        exec(`haxe --macro "CliTools.getClasspath()" ${args.join(' ')}`, (err, stdout, stderr) => {
+            if (err) resolve(fallback);
+
+            const classpath = stdout.split("\n")
+                .filter(l => l.startsWith('path: '))
+                .map(l => l.substring(6)); // 'path: '.length
+
+            resolve(classpath);
+        });
+    });
 }
