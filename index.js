@@ -47,6 +47,17 @@ module.exports = function(hxmlContent) {
             return cb(err);
         }
 
+        if (stderr && options.emitWarnings) {
+            const lines = stderr.split('\n');
+            const warnReg = new RegExp("^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : Warning : (.*)$");
+
+            lines.forEach(line => {
+                if (!line) return;
+                const err = new Error(line);
+                if (warnReg.test(line)) context.emitWarning(err);
+            });
+        }
+
         // If the hxml file outputs something other than client JS, we should not include it in the bundle.
         // We're only passing it through webpack so that we get `watch` and the like to work.
         if (!jsOutputFile) {
