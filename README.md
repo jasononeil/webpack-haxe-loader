@@ -186,6 +186,9 @@ The Haxe Loader supports a number of options:
 - `sizeReport`: *(Boolean)* Generate size report (see below)
 - `extra`: *(String)* Additional Haxe compiler arguments, applied after the HXML file
 - `delayForNonJsBuilds`: See [advanced usage tip with non-JS targets](webpack-tips.md)
+- `logCommand`: *(Boolean)* Logs final Haxe compiler arguments (via `console.log`)
+- `ignoreWarnings`: *(Boolean)* Do not forward Haxe warnings to webpack
+- `emitStdoutAsWarning`: *(Boolean)* Generate a webpack warning with Haxe's stdout
 
 
 ## Detailed size reporting
