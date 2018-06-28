@@ -80,8 +80,12 @@ function displaySource(
     linesAround = LINES_AROUND,
     linesInside = LINES_INSIDE
 ) {
+    if (src == null) return chalk.red('Cannot get source code for this error');
     const lines = src.split('\n');
-    if (line > lines.length) throw('Invalid error...');
+
+    if (line > lines.length) {
+        return chalk.red('Invalid error: cannot find line #' + line);
+    }
 
     const ret = [];
     line = line | 0;
@@ -114,11 +118,13 @@ function displaySource(
         let lineStr = color(isHighlighted ? '> ' : '  ');
         lineStr += color(lpad(i, String(end).length) + ' | ');
 
-        if (isHighlighted && line == endLine && (column || column === 0)) {
+        if (isHighlighted && line == endLine && column >= 0) {
             lineStr += chalk.grey(sourceLine.substring(0, column - 1));
             lineStr += chalk.white(sourceLine.substring(column - 1, endColumn - 1));
-            if (sourceLine.length >= endColumn)
+
+            if (sourceLine.length >= endColumn) {
                 lineStr += chalk.grey(sourceLine.substring(endColumn - 1));
+            }
         } else {
             lineStr += color(sourceLine);
         }
