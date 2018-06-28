@@ -41,10 +41,40 @@ module.exports = function(hxmlContent) {
     registerDepencencies(context, classpath);
 
     // Execute the Haxe build.
-    console.log('haxe', args.join(' '));
-    exec(`haxe ${args.join(' ')}`, (err, stdout, stderr) => {
+    const haxeCommand = `haxe ${args.join(' ')}`;
+    if (options.logCommand) console.log(haxeCommand);
+    exec(haxeCommand, (err, stdout, stderr) => {
+        // Parse errors and warnings
+        if (stderr) {
+            let errorIndex = 0;
+            const lines = stderr.split('\n');
+            const problemMatcher = new RegExp(
+                "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)$"
+            );
+
+            lines.forEach(line => {
+                if (!line || !problemMatcher.test(line)) return;
+                const err = new Error(line);
+
+                if (problemMatcher.exec(line)[6] === 'Warning') {
+                    if (!options.ignoreWarnings) {
+                        Object.assign(err, {index: ++errorIndex});
+                        context.emitWarning(err);
+                    }
+                } else {
+                    Object.assign(err, {index: ++errorIndex});
+                    context.emitError(err);
+                }
+            });
+        }
+
+        if (stdout && options.emitStdoutAsWarning) {
+            context.emitWarning(new Error('[HAXE STDOUT]\n' + stdout));
+        }
+
+        // Fail if haxe compilation failed
         if (err) {
-            return cb(err);
+            return cb(new Error(`Haxe Loader: compilation failed\n${haxeCommand}`));
         }
 
         // If the hxml file outputs something other than client JS, we should not include it in the bundle.
