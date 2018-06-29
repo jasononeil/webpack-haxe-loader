@@ -6,15 +6,21 @@ const problemMatcher = new RegExp(
 );
 
 function isHaxeError(error) {
-    return problemMatcher.test(error.message);
+    return (error.name == 'ModuleError' || error.name == 'ModuleWarning')
+        && error.message
+        && problemMatcher.test(error.message);
 }
 
 function isHaxeCompilationError(error) {
-    return error.message.indexOf('Haxe Loader: compilation failed') > -1;
+    return error.name == 'ModuleBuildError'
+        && error.message
+        && error.message.indexOf('Haxe Loader: compilation failed') > -1;
 }
 
 function isHaxeCompilationOutput(error) {
-    return error.message.indexOf('[HAXE STDOUT]\n') === 0;
+    return error.name == 'ModuleWarning'
+        && error.message
+        && error.message.indexOf('[HAXE STDOUT]\n') === 0;
 }
 
 function transform(error) {
