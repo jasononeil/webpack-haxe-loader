@@ -45,11 +45,12 @@ function formatWarning(warning) {
 function formatCompilationError(error) {
     const severity = 'error';
     const baseError = formatTitle(severity, severity);
+    const color = error.message === 'Compilation failed' ? chalk.grey : chalk.white;
 
     return concat(
         `${baseError} ${removeLoaders(error.file)}: ${error.message}`,
         '',
-        chalk.grey(error.infos),
+        color(error.infos),
         ''
     ).join('\n');
 }
