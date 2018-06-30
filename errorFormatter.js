@@ -238,10 +238,33 @@ function groupErrors(errors) {
 function isSubError(error, previous) {
     if (error.message === 'Defined in this class') return true;
 
+    const fieldOverload = /Field [^\s]+ overloads parent class with different or incomplete type/;
     if (
         error.message === 'Base field is defined here'
+        && previous && fieldOverload.test(previous.message)
+    ) return true;
+
+    const interfaceField = /Field [^\s]+ has different type than in [^\s]+/;
+    if (
+        error.message === 'Interface field is defined here'
+        && previous && interfaceField.test(previous.message)
+    ) return true;
+
+    if (
+        error.message.indexOf('Accessor method is here') > 0
         && previous
-        && previous.message === 'Field render overloads parent class with different or incomplete type'
+        && previous.message.indexOf('Macro methods cannot be used as property accessor') > 0
+    ) return true;
+
+    const fieldHasNoExpression = /Field [^\s]+ has no expression `(possible typing order issue`)/;
+    if (
+        error.message.indexOf('While building') == 0
+        && previous && fieldHasNoExpression.test(previous.message)
+    ) return true;
+
+    if (
+        error.message === 'Cancellation happened here'
+        && previous && previous.message === 'Extern constructor could not be inlined'
     ) return true;
 
     return false;
