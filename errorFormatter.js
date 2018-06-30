@@ -16,12 +16,33 @@ function formatError(error) {
     const file = removeLoaders(error.file);
     const src = fs.readFileSync(file, {encoding: 'utf-8'});
 
-    return concat(
+    const ret = concat(
         `${baseError} in ${file}`,
         '',
         error.message,
         '',
         displaySource(src, error.positions),
+        ''
+    );
+
+    if (error.contextErrors) {
+        error.contextErrors.forEach(error => ret.push(formatSubError(error)));
+    }
+
+    return ret.join('\n');
+}
+
+function formatSubError(error) {
+    const baseError = formatTitle('error', '->');
+
+    const file = removeLoaders(error.file);
+    const src = fs.readFileSync(file, {encoding: 'utf-8'});
+    const indent = '  ';
+
+    return concat(
+        indent + baseError + ' ' + error.message,
+        indent + chalk.grey(file),
+        displaySource(src, error.positions.slice(0, 1), indent, 1, 0),
         ''
     ).join('\n');
 }
@@ -37,7 +58,7 @@ function formatWarning(warning) {
         '',
         warning.message,
         '',
-        displaySource(src, warning.positions, 5, 0, 2),
+        displaySource(src, warning.positions, '', 5, 0, 2),
         ''
     ).join('\n');
 }
@@ -76,6 +97,7 @@ function removeLoaders(file) {
 function displaySource(
     src,
     [line, endLine, column, endColumn],
+    indent = '',
     maxLines = MAX_LINES,
     linesAround = LINES_AROUND,
     linesInside = LINES_INSIDE
@@ -108,14 +130,14 @@ function displaySource(
 
         if (isHighlighted && nbLines > maxLines) {
             if (i - line == linesInside) {
-                ret.push(chalk.grey(' [...]'));
+                ret.push(indent + chalk.grey(' [...]'));
                 continue;
             } else if (i - line > linesInside && endLine - i >= linesInside) {
                 continue;
             }
         }
 
-        let lineStr = color(isHighlighted ? '> ' : '  ');
+        let lineStr = indent + color(isHighlighted ? '> ' : '  ');
         lineStr += color(lpad(i, String(end).length) + ' | ');
 
         if (isHighlighted && line == endLine && column >= 0) {
@@ -185,19 +207,44 @@ function format(errors, type) {
 function groupErrors(errors) {
     const map = {};
     const other = [];
+    let previous = null;
 
     errors.forEach(error => {
         if (error.type != 'Haxe Error') return other.push(error);
 
         const key = error.file + ':' + error.positions.join(':');
+        let isSub = false;
 
-        if (map[key]) map[key].message += '\n' + error.message;
-        else map[key] = error;
+        if (map[key]) {
+            map[key].message += '\n' + error.message;
+        } else {
+            if (isSubError(error, previous)) {
+                isSub = true;
+                if (!previous.contextErrors) previous.contextErrors = [];
+                previous.contextErrors.push(error);
+            } else {
+                map[key] = error;
+            }
+        }
+
+        if (!isSub) previous = error;
     });
 
     const groupedErrors = [];
     for (let k in map) if (map.hasOwnProperty(k)) groupedErrors.push(map[k]);
     return groupedErrors.concat(other);
+}
+
+function isSubError(error, previous) {
+    if (error.message === 'Defined in this class') return true;
+
+    if (
+        error.message === 'Base field is defined here'
+        && previous
+        && previous.message === 'Field render overloads parent class with different or incomplete type'
+    ) return true;
+
+    return false;
 }
 
 module.exports = format;
