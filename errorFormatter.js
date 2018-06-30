@@ -47,7 +47,7 @@ function formatCompilationError(error) {
     const baseError = formatTitle(severity, severity);
 
     return concat(
-        `${baseError} Compilation failed for ${removeLoaders(error.file)}`,
+        `${baseError} ${removeLoaders(error.file)}: ${error.message}`,
         '',
         chalk.grey(error.infos),
         ''

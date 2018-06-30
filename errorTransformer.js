@@ -14,7 +14,7 @@ function isHaxeError(error) {
 function isHaxeCompilationError(error) {
     return error.name == 'ModuleBuildError'
         && error.message
-        && error.message.indexOf('Haxe Loader: compilation failed') > -1;
+        && error.message.split('\n').shift().indexOf('Haxe Loader: ') > -1;
 }
 
 function isHaxeCompilationOutput(error) {
@@ -39,10 +39,15 @@ function transform(error) {
     if (isHaxeCompilationError(error)) {
         const lines = error.message.split('\n');
 
+        const first = lines.shift();
+        let message = "Compilation failed";
+        const reg = /Haxe Loader: (.*)$/;
+        if (reg.test(first)) message = reg.exec(first)[1];
+
         return Object.assign({}, error, {
             type: 'Haxe Compilation Error',
-            message: lines[0],
-            infos: lines[1]
+            message: message,
+            infos: lines.join('\n')
         });
     }
 
