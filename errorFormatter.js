@@ -254,7 +254,7 @@ function isSubError(error, previous) {
     if (error.message === 'Defined in this class') return true;
 
     if (previous.message === 'Could not find a suitable overload, reasons follow') {
-        return (error.message !== 'End of overload failure reasons')
+        return (error.message !== 'End of overload failure reasons');
     }
 
     if (previous.message === 'Extern constructor could not be inlined') {
@@ -311,7 +311,7 @@ function isSubError(error, previous) {
         && interfaceField.test(previous.message)
     ) return true;
 
-    const fieldHasNoExpression = /Field [^\s]+ has no expression `(possible typing order issue`)/;
+    const fieldHasNoExpression = /Field [^\s]+ has no expression \(possible typing order issue\)/;
     if (
         error.message.startsWith('While building')
         && fieldHasNoExpression.test(previous.message)
