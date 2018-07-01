@@ -42,7 +42,7 @@ function formatSubError(error) {
     return concat(
         indent + baseError + ' ' + error.message,
         indent + chalk.grey(file),
-        displaySource(src, error.positions, indent, 1, 0),
+        displaySource(src, error.positions, indent, 1, 0, 1),
         ''
     ).join('\n');
 }
