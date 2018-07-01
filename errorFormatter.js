@@ -42,7 +42,7 @@ function formatSubError(error) {
     return concat(
         indent + baseError + ' ' + error.message,
         indent + chalk.grey(file),
-        displaySource(src, error.positions.slice(0, 1), indent, 1, 0),
+        displaySource(src, error.positions, indent, 1, 0),
         ''
     ).join('\n');
 }
@@ -212,19 +212,23 @@ function groupErrors(errors) {
     errors.forEach(error => {
         if (error.type != 'Haxe Error') return other.push(error);
 
-        const key = error.file + ':' + error.positions.join(':');
+        const key = flattenPosition(error);
         let isSub = false;
 
-        if (map[key]) {
-            map[key].message += '\n' + error.message;
-        } else {
-            if (isSubError(error, previous)) {
-                isSub = true;
-                if (!previous.contextErrors) previous.contextErrors = [];
-                previous.contextErrors.push(error);
+        if (isSubError(error, previous)) {
+            isSub = true;
+            if (!previous.contextErrors) {
+                previous.contextErrors = [error];
             } else {
-                map[key] = error;
+                const previousSub = previous.contextErrors[previous.contextErrors.length - 1];
+                const prevKey = flattenPosition(previousSub);
+
+                if (key === prevKey) previousSub.message += '\n       ' + error.message
+                else previous.contextErrors.push(error);
             }
+        } else if (!ignoreError(error)) {
+            if (map[key]) map[key].message += '\n' + error.message;
+            else map[key] = error;
         }
 
         if (!isSub) previous = error;
@@ -235,36 +239,86 @@ function groupErrors(errors) {
     return groupedErrors.concat(other);
 }
 
+function flattenPosition(error) {
+    return error.file + ':' + error.positions.join(':');
+}
+
+function ignoreError(error) {
+    if (error.message === 'End of overload failure reasons') return true;
+
+    return false;
+}
+
 function isSubError(error, previous) {
+    if (!previous || !previous.message) return false;
     if (error.message === 'Defined in this class') return true;
+
+    if (previous.message === 'Could not find a suitable overload, reasons follow') {
+        return (error.message !== 'End of overload failure reasons')
+    }
+
+    if (
+        error.message === 'Cancellation happened here'
+        && previous.message === 'Extern constructor could not be inlined'
+    ) return true;
+
+    if (
+        error.message === 'Add @:isVar here to enable it'
+        && previous.message === 'This field cannot be accessed because it is not a real variable'
+    ) return true;
+
+    if (
+        error.message === 'While specializing this call'
+        && previous.message === 'Only generic type parameters can be constructed'
+    ) return true;
+
+    if (error.message === 'Previously defined here') {
+        if (previous.message === 'Duplicate key') return true;
+        if (previous.message.startsWith('Duplicate access modifier')) return true;
+
+        return false;
+    }
+
+    if (
+        error.message === 'Conflicts with this'
+        && previous.message.startsWith('Conflicting access modifier')
+    ) return true;
+
+    if (
+        error.message.indexOf('Accessor method is here') > 0
+        && previous.message.indexOf('Macro methods cannot be used as property accessor') > 0
+    ) return true;
+
+    const fieldRedefine = /Cannot redefine field [^\s]+ with different type/;
+    if (fieldRedefine.test(previous.message)) {
+        if (error.message.startsWith('First type was')) return true;
+        if (error.message.startsWith('Second type was')) return true;
+
+        return false;
+    }
 
     const fieldOverload = /Field [^\s]+ overloads parent class with different or incomplete type/;
     if (
         error.message === 'Base field is defined here'
-        && previous && fieldOverload.test(previous.message)
+        && fieldOverload.test(previous.message)
     ) return true;
 
     const interfaceField = /Field [^\s]+ has different type than in [^\s]+/;
     if (
         error.message === 'Interface field is defined here'
-        && previous && interfaceField.test(previous.message)
-    ) return true;
-
-    if (
-        error.message.indexOf('Accessor method is here') > 0
-        && previous
-        && previous.message.indexOf('Macro methods cannot be used as property accessor') > 0
+        && interfaceField.test(previous.message)
     ) return true;
 
     const fieldHasNoExpression = /Field [^\s]+ has no expression `(possible typing order issue`)/;
     if (
-        error.message.indexOf('While building') == 0
-        && previous && fieldHasNoExpression.test(previous.message)
+        error.message.startsWith('While building')
+        && fieldHasNoExpression.test(previous.message)
     ) return true;
 
+    const fieldTypeMismatch = /Cannot create field [^\s]+ due to type mismatch/;
     if (
-        error.message === 'Cancellation happened here'
-        && previous && previous.message === 'Extern constructor could not be inlined'
+        error.message === 'Conflicting field was defined here'
+        && fieldTypeMismatch.test(previous.message)
     ) return true;
 
     return false;
