@@ -234,7 +234,7 @@ function registerDepencencies(context, classpath) {
 const unsupportedHaxeOptions = 'Unsupported Haxe options:\n'
     + ' --next, --each    haxe-loader only supports a single build per hxml\n'
     + ' -cmd, --cmd       to avoid side effects during compilation of bundles\n'
-    + ' --cwd, -C         TODO: why?\n'
+    + ' --cwd, -C         changing working directory can cause Webpack issues\n'
     + ' -lib modular      interaction with haxe-modular is handled internally\n';
 
 function prepare(options, context, ns, hxmlContent, jsTempFile) {
