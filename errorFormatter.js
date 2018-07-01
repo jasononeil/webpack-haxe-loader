@@ -257,10 +257,12 @@ function isSubError(error, previous) {
         return (error.message !== 'End of overload failure reasons')
     }
 
-    if (
-        error.message === 'Cancellation happened here'
-        && previous.message === 'Extern constructor could not be inlined'
-    ) return true;
+    if (previous.message === 'Extern constructor could not be inlined') {
+        if (error.message === 'Cancellation happened here') return true;
+        if (error.message === 'Variable is used here') return true;
+
+        return false;
+    }
 
     if (
         error.message === 'Add @:isVar here to enable it'
