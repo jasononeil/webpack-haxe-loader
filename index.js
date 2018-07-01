@@ -74,7 +74,7 @@ module.exports = function(hxmlContent) {
 
         // Fail if haxe compilation failed
         if (err) {
-            return cb(new Error(`Haxe Loader: compilation failed\n${haxeCommand}`));
+            return cb(makeError('Compilation failed', haxeCommand));
         }
 
         // If the hxml file outputs something other than client JS, we should not include it in the bundle.
@@ -210,6 +210,12 @@ function findImports(content) {
     return results;
 }
 
+function makeError(reason, message) {
+    const err = new Error(`Haxe Loader: ${reason}\n${message}`);
+    err.stack = "";
+    return err;
+}
+
 function makeJSTempFile() {
     const path = tmp.tmpNameSync({ postfix: '.js' });
     const nop = () => {};
@@ -224,6 +230,12 @@ function registerDepencencies(context, classpath) {
     // Listen for any changes in the classpath
     classpath.forEach(path => context.addContextDependency(path));
 }
+
+const unsupportedHaxeOptions = 'Unsupported Haxe options:\n'
+    + ' --next, --each    haxe-loader only supports a single build per hxml\n'
+    + ' -cmd, --cmd       to avoid side effects during compilation of bundles\n'
+    + ' --cwd, -C         changing working directory can cause Webpack issues\n'
+    + ' -lib modular      interaction with haxe-modular is handled internally\n';
 
 function prepare(options, context, ns, hxmlContent, jsTempFile) {
     let args = [];
@@ -251,16 +263,20 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         const name = hxmlOptions[i];
 
         if (name === '--next') {
-            throw new Error(
-                `${context.resourcePath} (or \`options.extra\`) included a "--next" line, `
-                + `haxe-loader only supports a single build per hxml file.`
+            throw makeError(
+                'Unsupported configuration',
+                'Hxml file or `options.extra` included a "--next" command, '
+                + 'but haxe-loader only supports a single build per hxml file.'
+                + '\n\n' + unsupportedHaxeOptions
             );
         }
 
         if (name === '-cmd' || name === '--cmd' || name === '-C' || name === '--cwd') {
-            throw new Error(
-                `${context.resourcePath} (or \`options.extra\`) included a "${name}" line, `
-                + `which is not allowed by haxe-loader.`
+            throw makeError(
+                'Unsupported configuration',
+                `Hxml file or \`options.extra\` included a "${name}" line, `
+                + 'which is not allowed by haxe-loader.'
+                + '\n\n' + unsupportedHaxeOptions
             );
         }
 
@@ -296,8 +312,11 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
             const value = hxmlOptions[++i];
 
             if (/^modular(:|$)/.test(value)) {
-                throw new Error(
-                    'When using haxe-loader, you need to remove `-lib modular` from your hxml file'
+                throw makeError(
+                    'Unsupported configuration',
+                    'When using haxe-loader, you need to remove `-lib modular` from your hxml file '
+                    + 'and `options.extras`'
+                    + '\n\n' + unsupportedHaxeOptions
                 );
             }
 
