@@ -49,7 +49,7 @@ module.exports = function(hxmlContent) {
             let errorIndex = 0;
             const lines = stderr.split('\n');
             const problemMatcher = new RegExp(
-                "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)$"
+                "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)\r?$"
             );
 
             lines.forEach(line => {

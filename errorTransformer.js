@@ -2,7 +2,7 @@
 
 // 1: file, 2: line, 3: endline, 4: column, 5: endColumn, 6: severity, 7: message
 const problemMatcher = new RegExp(
-    "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)$"
+    "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)\r?$"
 );
 
 function isHaxeError(error) {
