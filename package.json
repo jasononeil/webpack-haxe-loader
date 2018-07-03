@@ -10,7 +10,10 @@
   },
   "files": [
     "index.js",
+    "errorFormatter.js",
+    "errorTransformer.js",
     "haxelib",
+    "utils",
     "README.md"
   ],
   "scripts": {
