@@ -293,8 +293,10 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
 }
 
 function getClasspath(args, fallback) {
+    const filteredArgs = args.filter(a => !a.startsWith('--connect'));
+
     return new Promise((resolve) => {
-        exec(`haxe --macro "CliTools.getClasspath()" ${args.join(' ')}`, (err, stdout, stderr) => {
+        exec(`haxe --macro "CliTools.getClasspath()" ${filteredArgs.join(' ')}`, (err, stdout, stderr) => {
             if (err) resolve(fallback);
 
             const classpath = stdout.split("\n")
