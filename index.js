@@ -10,6 +10,9 @@ const split = require('haxe-modular/tool/bin/split');
 const hooks = require('haxe-modular/bin/hooks');
 const tokenize = require('yargs-parser/lib/tokenize-arg-string');
 
+const problemMatcher = require('./errorParser').problemMatcher;
+const identifyError = require('./errorParser').identifyError;
+
 const cache = Object.create(null);
 // resolve hooks once
 const graphHooks = hooks.getGraphHooks();
@@ -48,15 +51,12 @@ module.exports = function(hxmlContent) {
         if (stderr) {
             let errorIndex = 0;
             const lines = stderr.split('\n');
-            const problemMatcher = new RegExp(
-                "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)\r?$"
-            );
 
             lines.forEach(line => {
-                if (!line || !problemMatcher.test(line)) return;
+                if (!line || !identifyError(line)) return;
                 const err = new Error(line);
 
-                if (problemMatcher.exec(line)[6] === 'Warning') {
+                if (problemMatcher.test(line) && problemMatcher.exec(line)[6] === 'Warning') {
                     if (!options.ignoreWarnings) {
                         Object.assign(err, {index: ++errorIndex});
                         context.emitWarning(err);
