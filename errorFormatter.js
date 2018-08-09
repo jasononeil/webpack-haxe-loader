@@ -211,7 +211,8 @@ function groupErrors(errors) {
     let previous = null;
 
     errors.forEach(error => {
-        if (error.type != 'Haxe Error') return other.push(error);
+        if (error.type != 'Haxe Error' && error.type != 'Haxe Warning')
+            return other.push(error);
 
         const key = flattenPosition(error);
         let isSub = false;
