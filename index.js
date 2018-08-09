@@ -244,6 +244,11 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
     let mainClass = 'Main';
     let preventJsOutput = false;
 
+    // Add --connect if asked for compilation server
+    if (options.server) {
+        args.push(`--connect ${options.server}`);
+    }
+
     // Add args that are specific to haxe-loader
     if (options.debug) {
         args.push('-debug');
