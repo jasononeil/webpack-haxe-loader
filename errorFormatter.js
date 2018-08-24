@@ -13,52 +13,81 @@ const LINES_INSIDE = 4;
 function formatError(error) {
     const severity = 'error';
     const baseError = formatTitle(severity, severity);
-    const file = removeLoaders(error.file);
-    const src = fs.readFileSync(file, {encoding: 'utf-8'});
+    let file = error.file;
+    let extras = [];
+
+    if (file == '--macro') {
+        file = 'initialization macro';
+    } else {
+        file = removeLoaders(file);
+        const src = fs.readFileSync(file, {encoding: 'utf-8'});
+        extras = [
+            displaySource(src, error.positions),
+            ''
+        ];
+    }
 
     const ret = concat(
         `${baseError} in ${file}`,
         '',
         error.message,
         '',
-        displaySource(src, error.positions),
-        ''
+        extras
     );
 
     if (error.contextErrors) {
-        error.contextErrors.forEach(error => ret.push(formatSubError(error)));
+        error.contextErrors.forEach(error => ret.push(formatSubError(error, 'error')));
     }
 
     return ret.join('\n');
 }
 
-function formatSubError(error) {
-    const baseError = formatTitle('error', '->');
+function formatWarning(warning) {
+    const severity = 'warning';
+    const baseError = formatTitle(severity, severity);
+    let file = warning.file;
+    let extras = [];
+
+    if (file == '--macro') {
+        file = 'initialization macro';
+    } else {
+        file = removeLoaders(file);
+        const src = fs.readFileSync(file, {encoding: 'utf-8'});
+        extras = [
+            displaySource(src, warning.positions, '', 5, 0, 2),
+            ''
+        ];
+    }
+
+    const ret = concat(
+        `${baseError} in ${file}`,
+        '',
+        warning.message,
+        '',
+        extras
+    );
+
+    if (warning.contextErrors) {
+        warning.contextErrors.forEach(warning => ret.push(formatSubError(warning, 'warning')));
+    }
+
+    return ret.join('\n');
+}
+
+function formatSubError(error, severity) {
+    const indent = '  ';
+    const baseError = formatTitle(severity, '->');
+
+    if (error.file == '--macro')
+        return indent + baseError + ' ' + error.message;
 
     const file = removeLoaders(error.file);
     const src = fs.readFileSync(file, {encoding: 'utf-8'});
-    const indent = '  ';
 
     return concat(
         indent + baseError + ' ' + error.message,
         indent + chalk.grey(file),
         displaySource(src, error.positions, indent, 1, 0, 1),
-        ''
-    ).join('\n');
-}
-
-function formatWarning(warning) {
-    const severity = 'warning';
-    const baseError = formatTitle(severity, severity);
-    const file = removeLoaders(warning.file);
-    const src = fs.readFileSync(file, {encoding: 'utf-8'});
-
-    return concat(
-        `${baseError} in ${file}`,
-        '',
-        warning.message,
-        '',
-        displaySource(src, warning.positions, '', 5, 0, 2),
         ''
     ).join('\n');
 }
@@ -211,7 +240,8 @@ function groupErrors(errors) {
     let previous = null;
 
     errors.forEach(error => {
-        if (error.type != 'Haxe Error') return other.push(error);
+        if (error.type != 'Haxe Error' && error.type != 'Haxe Warning')
+            return other.push(error);
 
         const key = flattenPosition(error);
         let isSub = false;
