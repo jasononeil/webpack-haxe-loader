@@ -46,7 +46,7 @@ class Webpack {
 		}
 		switch (ct) {
 			case haxe.macro.Type.TType(_.get() => t, _):
-				var module = t.module.split('.').join('_');
+				var module = t.module.split('_').join('_$').split('.').join('_');
 				return createLoader(module);
 			default:
 		}
