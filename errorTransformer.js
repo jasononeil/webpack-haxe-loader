@@ -2,27 +2,43 @@
 
 const problemMatcher = require('./errorParser').problemMatcher;
 
-function isHaxeError(error) {
+function stripMessageHeader(errorMessage) {
+    if (!errorMessage) return errorMessage;
+
+    const messageHeaderReg = /^(Module\sError|Module\sWarning|Module\sbuild\sfailed).*?:$/;
+    const lines = errorMessage.split('\n');
+
+    if (messageHeaderReg.test(lines[0])) {
+        lines.shift();
+        return lines.join('\n');
+    }
+
+    return errorMessage;
+}
+
+function isHaxeError(error, message) {
     return (error.name == 'ModuleError' || error.name == 'ModuleWarning')
-        && error.message
-        && problemMatcher.test(error.message);
+        && message
+        && problemMatcher.test(message);
 }
 
-function isHaxeCompilationError(error) {
+function isHaxeCompilationError(error, message) {
     return error.name == 'ModuleBuildError'
-        && error.message
-        && error.message.split('\n').shift().indexOf('Haxe Loader: ') > -1;
+        && message
+        && message.split('\n').shift().indexOf('Haxe Loader: ') > -1;
 }
 
-function isHaxeCompilationOutput(error) {
+function isHaxeCompilationOutput(error, message) {
     return error.name == 'ModuleWarning'
-        && error.message
-        && error.message.indexOf('[HAXE STDOUT]\n') === 0;
+        && message
+        && message.indexOf('[HAXE STDOUT]\n') === 0;
 }
 
 function transform(error) {
-    if (isHaxeError(error)) {
-        const res = problemMatcher.exec(error.message);
+    const message = stripMessageHeader(error.message);
+
+    if (isHaxeError(error, message)) {
+        const res = problemMatcher.exec(message);
 
         return Object.assign({}, error, {
             file: res[1],
@@ -33,23 +49,23 @@ function transform(error) {
         });
     }
 
-    if (isHaxeCompilationError(error)) {
-        const lines = error.message.split('\n');
+    if (isHaxeCompilationError(error, message)) {
+        const lines = message.split('\n');
 
         const first = lines.shift();
-        let message = "Compilation failed";
+        let newMessage = 'Compilation failed';
         const reg = /Haxe Loader: (.*)$/;
-        if (reg.test(first)) message = reg.exec(first)[1];
+        if (reg.test(first)) newMessage = reg.exec(first)[1];
 
         return Object.assign({}, error, {
             type: 'Haxe Compilation Error',
-            message: message,
+            message: newMessage,
             infos: lines.join('\n')
         });
     }
 
-    if (isHaxeCompilationOutput(error)) {
-        const lines = error.message.split('\n');
+    if (isHaxeCompilationOutput(error, message)) {
+        const lines = message.split('\n');
         lines.shift();
 
         return Object.assign({}, error, {
