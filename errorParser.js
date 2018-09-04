@@ -2,7 +2,7 @@
 
 // 1: file, 2: line, 3: endline, 4: column, 5: endColumn, 6: severity, 7: message
 const problemMatcher = new RegExp(
-    "^(.+):(\\d+): (?:lines \\d+-(\\d+)|character(?:s (\\d+)-| )(\\d+)) : (?:(Warning) : )?(.*)\r?$"
+    "^(.+):(\\d+):\\s(?:lines\\s\\d+-(\\d+)|character(?:s\\s(\\d+)-|\\s)(\\d+))\\s:\\s(?:(Warning)\\s:\\s)?(.*)\\r?$"
 );
 
 const fatalErrorMatcher = new RegExp("^Fatal error: (.*)$");
