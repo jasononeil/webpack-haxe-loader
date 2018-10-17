@@ -10,8 +10,9 @@ const split = require('haxe-modular/tool/bin/split');
 const hooks = require('haxe-modular/bin/hooks');
 const tokenize = require('yargs-parser/lib/tokenize-arg-string');
 
-const problemMatcher = require('./errorParser').problemMatcher;
-const identifyError = require('./errorParser').identifyError;
+const haxeErrorParser = require('haxe-error-parser');
+const problemMatcher = haxeErrorParser.problemMatcher;
+const identifyError = haxeErrorParser.identifyError;
 
 const cache = Object.create(null);
 // resolve hooks once
