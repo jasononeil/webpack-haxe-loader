@@ -41,7 +41,7 @@ module.exports = function(hxmlContent) {
         jsTempFile
     );
 
-    registerDepencencies(context, classpath);
+    registerDependencies(context, options, classpath);
 
     // Execute the Haxe build.
     const haxeCommand = `haxe ${args.join(' ')}`;
@@ -184,7 +184,7 @@ function fromCache(context, query, cb) {
         throw new Error(`${ns}.hxml is not a known entry point`);
     }
 
-    registerDepencencies(context, cached.classpath);
+    registerDependencies(context, options, cached.classpath);
 
     if (!cached.results.length) {
         throw new Error(`${ns}.hxml did not emit any modules`);
@@ -226,9 +226,15 @@ function makeJSTempFile() {
     return { path, cleanup };
 }
 
-function registerDepencencies(context, classpath) {
+function registerDependencies(context, options, classpath) {
     // Listen for any changes in the classpath
     classpath.forEach(path => context.addContextDependency(path));
+
+    if (options.watch != null && Array.isArray(options.watch)) {
+        options.watch.forEach(
+            path => context.addContextDependency(path)
+        );
+    }
 }
 
 const unsupportedHaxeOptions = 'Unsupported Haxe options:\n'

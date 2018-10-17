@@ -190,6 +190,7 @@ The Haxe Loader supports a number of options:
 - `ignoreWarnings`: *(Boolean)* Do not forward Haxe warnings to webpack
 - `emitStdoutAsWarning`: *(Boolean)* Generate a webpack warning with Haxe's stdout
 - `server`: *(Number | String)* Use Haxe compilation server at `[host:]port`
+- `watch`: *(String[])* List of additional path (directories or files) to watch
 
 
 ## Detailed size reporting
