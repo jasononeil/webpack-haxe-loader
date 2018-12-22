@@ -14,8 +14,8 @@ If you're unsure why you should be using Webpack, read
 ### Examples
 
 There is a small example Haxe+Webpack project presenting
-[vanilla DOM](https://github.com/elsassph/webpack-haxe-example)
-and [React](https://github.com/elsassph/webpack-haxe-example/tree/react) approaches.
+[vanilla DOM](https://github.com/elsassph/webpack-haxe-example/tree/vanilla)
+and [React](https://github.com/elsassph/webpack-haxe-example/) approaches.
 These examples gives you a sample functional Webpack config, a couple of classes and leverage
 Webpack features like:
 
