@@ -263,7 +263,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
     args.push('-D', `webpack_namespace=${ns}`);
 
     // Merge hxml and options.extra
-    let flatHxml = hxmlContent.split('\n').filter(l => !l.startsWith('#')).join(' ');
+    let flatHxml = hxmlContent.split(/[\r\n]/).filter(l => !l.startsWith('#')).join(' ');
     if (options.extra) flatHxml += ' ' + options.extra;
 
     // Parse arguments for Haxe
