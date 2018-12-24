@@ -47,7 +47,8 @@ You must have Haxe compiler installed: https://haxe.org/download
 
 ```js
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
+  mode: 'development',
+  devtool: 'source-map',
   entry: './app.hxml',
   output: {
     filename: 'bundle.js'
@@ -148,6 +149,32 @@ according to the module name (e.g. `com_Foo.js`).
 
 To revert to the original naming behaviour, you can add `-D webpack_nonamedchunks`.
 
+## Dev server
+
+Webpack comes with a hand dev server with Hot Module Replacement (HMR) capability:
+[Webpack DevServer](https://webpack.js.org/configuration/dev-server/#devserver)
+
+Configuration should be added to the `webpack.config.js`:
+```js
+module.exports = {
+  ...
+  devServer: {
+      compress: true,
+      port: 9000,
+      overlay: true,         // show build errors
+      hot: true,             // enable HMR
+      disableHostCheck: true // Chrome security
+  }
+  ...
+}
+```
+
+Add `webpack-dev-server` npm module and the dev server as the `start` task in `package.json`:
+
+```json
+  "scripts": {
+    "start": "webpack-dev-server"
+```
 
 ## DevTools / source maps
 
