@@ -14,8 +14,8 @@ If you're unsure why you should be using Webpack, read
 ### Examples
 
 There is a small example Haxe+Webpack project presenting
-[vanilla DOM](https://github.com/elsassph/webpack-haxe-example)
-and [React](https://github.com/elsassph/webpack-haxe-example/tree/react) approaches.
+[vanilla DOM](https://github.com/elsassph/webpack-haxe-example/tree/vanilla)
+and [React](https://github.com/elsassph/webpack-haxe-example/) approaches.
 These examples gives you a sample functional Webpack config, a couple of classes and leverage
 Webpack features like:
 
@@ -47,7 +47,8 @@ You must have Haxe compiler installed: https://haxe.org/download
 
 ```js
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
+  mode: 'development',
+  devtool: 'source-map',
   entry: './app.hxml',
   output: {
     filename: 'bundle.js'
@@ -148,6 +149,32 @@ according to the module name (e.g. `com_Foo.js`).
 
 To revert to the original naming behaviour, you can add `-D webpack_nonamedchunks`.
 
+## Dev server
+
+Webpack comes with a hand dev server with Hot Module Replacement (HMR) capability:
+[Webpack DevServer](https://webpack.js.org/configuration/dev-server/#devserver)
+
+Configuration should be added to the `webpack.config.js`:
+```js
+module.exports = {
+  ...
+  devServer: {
+      compress: true,
+      port: 9000,
+      overlay: true,         // show build errors
+      hot: true,             // enable HMR
+      disableHostCheck: true // Chrome security
+  }
+  ...
+}
+```
+
+Add `webpack-dev-server` npm module and the dev server as the `start` task in `package.json`:
+
+```json
+  "scripts": {
+    "start": "webpack-dev-server"
+```
 
 ## DevTools / source maps
 
