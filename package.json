@@ -21,8 +21,8 @@
   "dependencies": {
     "chalk": "^1.1.3",
     "hash-sum": "^1.0.2",
-    "haxe-modular": "^0.10.15",
     "haxe-error-parser": "0.1.2",
+    "haxe-modular": "^0.11.0",
     "loader-utils": "^1.1.0",
     "null-loader": "^0.1.1",
     "tmp": "0.0.33",
