@@ -14,6 +14,7 @@
     "README.md"
   ],
   "scripts": {
+    "prepare": "lix download",
     "test": "npm run test:haxe && npm run test:js",
     "test:js": "node test/test-suite.js",
     "test:haxe": "haxe test/test-haxe.hxml && node test/dist/testHaxe.js"
@@ -22,10 +23,13 @@
     "chalk": "^1.1.3",
     "hash-sum": "^1.0.2",
     "haxe-error-parser": "0.1.2",
-    "haxe-modular": "^0.11.0",
+    "haxe-modular": "^0.14.0",
     "loader-utils": "^1.1.0",
     "null-loader": "^0.1.1",
     "tmp": "0.0.33",
     "yargs-parser": "^10.0.0"
+  },
+  "devDependencies": {
+    "lix": "^15.10.1"
   }
 }

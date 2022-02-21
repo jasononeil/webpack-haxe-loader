@@ -104,7 +104,7 @@ function updateCache(context, ns, { contentHash, results }, classpath) {
 }
 
 function processOutput(ns, jsTempFile, jsOutputFile, options) {
-    const content = fs.readFileSync(jsTempFile.path);
+    const content = fs.readFileSync(jsTempFile.path).toString();
     // Check whether the output has changed since last build
     const contentHash = hash(content);
     if (cache[ns] && cache[ns].hash === contentHash) return null;

@@ -3,7 +3,7 @@ const path = require('path');
 const chdir = require('process').chdir;
 const exec = require('child_process').exec;
 
-const suite = ['test1', 'test2'];
+const suite = ['test1', 'test2', 'test1-es6', 'test2-es6'];
 
 function validateOutput() {
     require('./validate-output');
