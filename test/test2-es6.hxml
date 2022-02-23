@@ -1,7 +1,7 @@
 -cp ../haxelib
 -cp src
--js dist/test2.js
+-js dist/test2-es6.js
 -main Test2
 -D webpack_nonamedchunks
--D js-es=5
+-D js-es=6
 

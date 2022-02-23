@@ -3,3 +3,4 @@
 -js dist/test1.js
 -main Test1
 -D webpack_nonamedchunks
+-D js-es=5
