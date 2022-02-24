@@ -229,11 +229,11 @@ function makeJSTempFile() {
 
 function registerDependencies(context, options, classpath) {
     // Listen for any changes in the classpath
-    classpath.forEach(path => context.addContextDependency(path));
+    classpath.forEach(classPath => context.addContextDependency(path.resolve(classPath)));
 
     if (options.watch != null && Array.isArray(options.watch)) {
         options.watch.forEach(
-            path => context.addContextDependency(path)
+            watchPath => context.addContextDependency(path.resolve(watchPath))
         );
     }
 }
@@ -339,7 +339,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         // Quote arguments that may need it
         if (name === '--macro' || name === '-resource' || name === '--resource' || name === '-r') {
             const value = hxmlOptions[++i];
-            args.push(name, `"${value}"`);
+            args.push(name, `${value}`);
             continue;
         }
 

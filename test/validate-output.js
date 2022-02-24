@@ -24,6 +24,7 @@ function validateTest1(callback) {
     // test.json
 
     assertInModule('./test1.hxml', modules, 'Test1 Haxe module', [
+        '/* injected header */',
         'var Test1 = function',
         'Test1.main()',
         '/*! ./src/test.json */', // require('./index.json')
