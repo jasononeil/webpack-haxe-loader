@@ -4,3 +4,4 @@
 -main Test1
 -D webpack_nonamedchunks
 -D js-es=5
+--macro "includeFile('src/header.js')"

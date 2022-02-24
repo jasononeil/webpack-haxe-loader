@@ -339,7 +339,7 @@ function prepare(options, context, ns, hxmlContent, jsTempFile) {
         // Quote arguments that may need it
         if (name === '--macro' || name === '-resource' || name === '--resource' || name === '-r') {
             const value = hxmlOptions[++i];
-            args.push(name, `"${value}"`);
+            args.push(name, `${value}`);
             continue;
         }
 
