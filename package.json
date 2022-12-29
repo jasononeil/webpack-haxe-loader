@@ -24,7 +24,7 @@
     "hash-sum": "^1.0.2",
     "haxe-error-parser": "0.1.2",
     "haxe-modular": "^0.14.0",
-    "loader-utils": "^1.1.0",
+    "loader-utils": "^3.2.1",
     "null-loader": "^0.1.1",
     "tmp": "0.0.33",
     "yargs-parser": "^13.1.2"
